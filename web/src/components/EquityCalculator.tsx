@@ -34,7 +34,7 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
     <div className={`equity-calculator${isHero ? " equity-calculator--hero" : ""}`}>
       <div className={isHero ? "equity-calculator-stack" : "booking-grid"}>
         <form className="booking-panel booking-fallback" onSubmit={(e) => e.preventDefault()}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: isHero ? "1.45rem" : "1.8rem", marginBottom: "0.35rem" }}>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: isHero ? "1.2rem" : "1.8rem", marginBottom: isHero ? "0.2rem" : "0.35rem" }}>
             Your numbers
           </h3>
           {!isHero && (
@@ -102,8 +102,8 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
               <h3
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: isHero ? "1.45rem" : "1.8rem",
-                  marginBottom: "0.35rem",
+                  fontSize: isHero ? "1.2rem" : "1.8rem",
+                  marginBottom: isHero ? "0.2rem" : "0.35rem",
                 }}
               >
                 No tappable equity at these numbers
@@ -117,19 +117,28 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
           ) : (
             <>
               <p className="eyebrow">Potentially borrowable</p>
-              <div className="fee-formula" style={{ marginBottom: "0.75rem" }}>
+              <div className="fee-formula" style={{ marginBottom: isHero ? "0.35rem" : "0.75rem" }}>
                 {formatUsd(result.tappableEquity)}
               </div>
-              <p className="form-note">
-                Equity on paper is {formatUsd(result.rawEquity)}. Lenders cap total borrowing at a share of home value,
-                so the borrowable figure is lower.
-              </p>
+              {!isHero && (
+                <p className="form-note">
+                  Equity on paper is {formatUsd(result.rawEquity)}. Lenders cap total borrowing at a share of home value,
+                  so the borrowable figure is lower.
+                </p>
+              )}
+              {isHero && (
+                <p className="form-note">
+                  Paper equity {formatUsd(result.rawEquity)} · LTV-capped borrowable below
+                </p>
+              )}
 
-              <div className="case-flow" style={{ marginTop: isHero ? "1rem" : "1.5rem" }}>
-                <div className="case-row">
-                  <span>Amount drawn from your lender</span>
-                  <span>{formatUsd(result.tappableEquity)}</span>
-                </div>
+              <div className="case-flow" style={{ marginTop: isHero ? "0.55rem" : "1.5rem" }}>
+                {!isHero && (
+                  <div className="case-row">
+                    <span>Amount drawn from your lender</span>
+                    <span>{formatUsd(result.tappableEquity)}</span>
+                  </div>
+                )}
                 <div className="case-row">
                   <span>Milestone fee ({formatPercent(result.feeRate)})</span>
                   <span>−{formatUsd(result.milestoneFee)}</span>
@@ -173,7 +182,7 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
                 </p>
               )}
 
-              <div className="hero-actions" style={{ marginTop: "1.25rem" }}>
+              <div className="hero-actions" style={{ marginTop: isHero ? "0.65rem" : "1.25rem" }}>
                 <Link className="btn btn-primary" to="/book">
                   Talk through these numbers
                 </Link>
@@ -186,11 +195,18 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
             </>
           )}
 
-          <p className="form-note" style={{ marginTop: "1.25rem" }}>
-            <strong>Estimate only.</strong> Not a loan offer, pre-qualification, quote, or investment advice.
-            {isHero
-              ? " Illustrative Bitcoin prices — not forecasts."
-              : " Actual limits, rates, and terms are set solely by your lender. Bitcoin price lines are fixed illustrative scenarios — not live quotes, and not predictions that any future price will occur."}
+          <p className="form-note" style={{ marginTop: isHero ? "0.55rem" : "1.25rem" }}>
+            {isHero ? (
+              <>
+                <strong>Estimate only.</strong> Not a quote or forecast.
+              </>
+            ) : (
+              <>
+                <strong>Estimate only.</strong> Not a loan offer, pre-qualification, quote, or investment advice.
+                Actual limits, rates, and terms are set solely by your lender. Bitcoin price lines are fixed
+                illustrative scenarios — not live quotes, and not predictions that any future price will occur.
+              </>
+            )}
           </p>
         </div>
       </div>

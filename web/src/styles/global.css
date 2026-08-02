@@ -395,7 +395,7 @@ p {
 
 .equity-calculator-stack {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.55rem;
 }
 
 .hero-calculator .booking-panel {
@@ -405,36 +405,104 @@ p {
 }
 
 .hero-calculator .booking-fallback {
-  padding: 1.1rem 1.2rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.hero-calculator .equity-calculator--hero h3 {
+  font-size: 1.2rem !important;
+  margin-bottom: 0.2rem !important;
+}
+
+.hero-calculator .eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 0.2rem;
 }
 
 .hero-calculator .fee-formula {
-  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  margin-bottom: 0.35rem !important;
+}
+
+.hero-calculator .form-note {
+  font-size: 0.75rem;
+  margin: 0.35rem 0 0.5rem;
+  line-height: 1.35;
+}
+
+.hero-calculator .case-flow {
+  margin-top: 0.55rem !important;
 }
 
 .hero-calculator .case-row {
-  padding: 0.55rem 0;
-  font-size: 0.92rem;
+  padding: 0.28rem 0;
+  font-size: 0.8rem;
+  gap: 0.65rem;
 }
 
 .hero-calculator .field {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.45rem;
+  gap: 0.2rem;
+}
+
+.hero-calculator .field label {
+  font-size: 0.78rem;
 }
 
 .hero-calculator .field input[type="text"] {
-  min-height: 2.65rem;
+  min-height: 2.15rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.92rem;
+}
+
+.hero-calculator .field input[type="range"] {
+  margin-top: 0.15rem;
+}
+
+.hero-calculator .hero-actions {
+  margin-top: 0.65rem !important;
+  gap: 0.5rem;
+}
+
+.hero-calculator .hero-actions .btn {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.hero-calculator .equity-calculator--hero .form-note:last-child {
+  margin-top: 0.55rem !important;
+  margin-bottom: 0;
 }
 
 @media (min-width: 1040px) {
   .hero-content {
-    grid-template-columns: minmax(0, 0.95fr) minmax(20rem, 1.05fr);
+    grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 1.15fr);
     min-height: 100svh;
-    padding-top: calc(var(--nav-h) + 1.5rem);
-    padding-bottom: 2rem;
+    padding-top: calc(var(--nav-h) + 1rem);
+    padding-bottom: 1.25rem;
+    gap: 1.25rem;
+    align-items: center;
   }
 
   .hero-brand {
     font-size: clamp(2.8rem, 5vw, 4.6rem);
+  }
+
+  .hero-brand-logo {
+    width: min(100%, 18.5rem);
+  }
+
+  .hero-support {
+    margin-bottom: 1.35rem;
+    font-size: 0.98rem;
+  }
+
+  /* Side-by-side cards inside the hero calculator — big vertical win */
+  .hero-calculator .equity-calculator-stack {
+    grid-template-columns: 0.92fr 1.08fr;
+    gap: 0.65rem;
+    align-items: start;
   }
 }
 
