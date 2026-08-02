@@ -151,7 +151,7 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
                   <span>{formatUsd(result.illustrativeFutureValueUsd)}</span>
                 </div>
                 <div className="case-row">
-                  <span>Interest-only, monthly</span>
+                  <span>Interest-only, monthly (2026 – 2029)</span>
                   <span>{formatUsdPrecise(result.monthlyInterestOnly)}</span>
                 </div>
                 {!isHero && (
