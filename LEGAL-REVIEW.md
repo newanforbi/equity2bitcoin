@@ -73,7 +73,8 @@ disclosure is sufficient or the fee structure itself needs revisiting.
 
 | Excluded | Source | Why |
 |---|---|---|
-| BTC price projections ($500K / $1M) | Plan p.2 | Highest-risk retail claims |
+| Plan BTC price projections ($500K by 2029 / $1M by 2033) as plan marketing copy | Plan p.2 | Highest-risk retail claims — site instead uses a labeled calculator scenario only |
+| Unlabeled / promised future BTC returns | — | Calculator may show an illustrative later-date USD value; must remain framed as scenario math, not a forecast |
 | Treasury compounding projections | Plan p.2 | Investor-facing |
 | Revenue/client projections | §VI | Investor-facing |
 | "Best-performing asset class" / extreme return figures | §I | Promotional / cherry-picked |
@@ -105,6 +106,7 @@ before any illustrative BTC quantity.
 - [ ] Milestone agreement finalized and consistent with site fee copy
 - [ ] Confirm state-by-state where services may be offered
 - [ ] Set `VITE_CALENDLY_URL` (and optional webhook)
-- [ ] Update `BTC_REFERENCE` price and `asOf` together, or remove the BTC line
+- [ ] Update `BTC_REFERENCE` / `BTC_FUTURE_SCENARIO` prices and dates together, or remove those lines
+- [ ] Counsel review of any forward BTC price scenario shown in `/calculator`
 - [ ] Confirm `hello@equity2bitcoin.com` is monitored
 - [ ] Re-review if analytics, ad pixel, CRM, or email capture is added

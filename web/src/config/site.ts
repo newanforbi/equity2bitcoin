@@ -12,12 +12,21 @@ export const SITE = {
 export const MILESTONE_FEE_RATE = 0.3;
 
 /**
- * Static illustrative BTC price for calculator education.
+ * Static illustrative BTC price used to convert "reaches Bitcoin" into a BTC quantity.
  * Update price and asOf together, or remove the BTC line entirely.
  */
 export const BTC_REFERENCE = {
-  priceUsd: 95_000,
-  asOf: "January 2026",
+  priceUsd: 35_000,
+  asOf: "November 2026",
+} as const;
+
+/**
+ * Optional later-date USD scenario applied to the same BTC quantity.
+ * Illustrative arithmetic only — not a forecast or promise of future value.
+ */
+export const BTC_FUTURE_SCENARIO = {
+  priceUsd: 450_000,
+  asOf: "November 2029",
 } as const;
 
 export const CALCULATOR_DEFAULTS = {

@@ -3,7 +3,7 @@
  * Pure functions only — every page that shows a dollar figure should import from here.
  */
 
-import { BTC_REFERENCE, MILESTONE_FEE_RATE } from "../config/site";
+import { BTC_FUTURE_SCENARIO, BTC_REFERENCE, MILESTONE_FEE_RATE } from "../config/site";
 
 export interface EquityInputs {
   homeValue: number;
@@ -22,6 +22,8 @@ export interface EquityResult {
   milestoneFee: number;
   netToBitcoin: number;
   illustrativeBtc: number;
+  /** Same BTC quantity valued at BTC_FUTURE_SCENARIO — not a forecast. */
+  illustrativeFutureValueUsd: number;
   monthlyInterestOnly: number;
   monthlyAmortizing: number;
   totalInterestOverTerm: number;
@@ -61,12 +63,15 @@ export function calculateEquity(inputs: EquityInputs): EquityResult {
   const monthlyAmortizing = amortizingPayment(tappableEquity, aprPercent, years);
   const totalInterestOverTerm = clampMoney(monthlyAmortizing * years * 12 - tappableEquity);
 
+  const illustrativeBtc = netToBitcoin / BTC_REFERENCE.priceUsd;
+
   return {
     rawEquity,
     tappableEquity,
     milestoneFee,
     netToBitcoin,
-    illustrativeBtc: netToBitcoin / BTC_REFERENCE.priceUsd,
+    illustrativeBtc,
+    illustrativeFutureValueUsd: illustrativeBtc * BTC_FUTURE_SCENARIO.priceUsd,
     monthlyInterestOnly,
     monthlyAmortizing,
     totalInterestOverTerm,
