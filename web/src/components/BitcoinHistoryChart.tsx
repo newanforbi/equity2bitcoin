@@ -70,11 +70,13 @@ export function BitcoinHistoryChart() {
             borderColor: "rgba(212, 175, 55, 0.2)",
             mode: PriceScaleMode.Logarithmic,
             entireTextOnly: true,
+            scaleMargins: { top: 0.14, bottom: 0.08 },
           },
           timeScale: {
             borderColor: "rgba(212, 175, 55, 0.2)",
             // Keep all-time history readable; page scroll must not zoom the chart.
             minBarSpacing: 0.05,
+            rightOffset: 4,
           },
           crosshair: {
             vertLine: { color: "rgba(212, 175, 55, 0.35)", labelBackgroundColor: "#1f1c18" },
@@ -129,14 +131,12 @@ export function BitcoinHistoryChart() {
         markers.sort((a, b) => String(a.time).localeCompare(String(b.time)));
         series.setMarkers(markers);
 
-        // Force all-time window (2010 → latest), not a zoomed recent slice.
-        chart.timeScale().setVisibleLogicalRange({ from: -2, to: data.length + 2 });
+        // All-time window (2010 → latest). Wheel zoom is off so page scroll cannot crop this.
+        chart.timeScale().fitContent();
         chartRef.current = chart;
         ro.observe(host);
         requestAnimationFrame(() => {
-          if (!cancelled && chart) {
-            chart.timeScale().setVisibleLogicalRange({ from: -2, to: data.length + 2 });
-          }
+          if (!cancelled && chart) chart.timeScale().fitContent();
         });
         setStatus("ready");
       } catch (e) {
