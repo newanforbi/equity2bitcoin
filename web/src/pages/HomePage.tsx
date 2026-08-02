@@ -64,7 +64,13 @@ export function HomePage() {
         <div className="hero-content">
           <div className="hero-copy">
             <h1 className="hero-brand">
-              Equity<span>2</span>Bitcoin
+              <img
+                src="/logo-equity2bitcoin-on-dark.png"
+                alt="Equity2Bitcoin"
+                width={520}
+                height={183}
+                className="hero-brand-logo"
+              />
             </h1>
             <p className="hero-headline">Equity isn’t wealth until it moves.</p>
             <p className="hero-support">

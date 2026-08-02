@@ -359,6 +359,12 @@ p {
   color: var(--gold);
 }
 
+.hero-brand-logo {
+  display: block;
+  width: min(100%, 22rem);
+  height: auto;
+}
+
 .hero-headline {
   font-family: var(--font-display);
   font-size: clamp(1.45rem, 3vw, 2.15rem);
