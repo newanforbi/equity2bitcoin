@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { BookingPanel } from "../components/BookingPanel";
+import { EquityCalculator } from "../components/EquityCalculator";
 import { EquityIQQuiz } from "../components/EquityIQQuiz";
 import { MILESTONE_FEE_RATE } from "../config/site";
 import { CASE_STEPS, FAQS, PHASES, VOLATILITY_STATEMENT, WORKED_EXAMPLE } from "../data/content";
@@ -61,21 +62,26 @@ export function HomePage() {
         </div>
         <div className="hero-scrim" />
         <div className="hero-content">
-          <h1 className="hero-brand">
-            Equity<span>2</span>Bitcoin
-          </h1>
-          <p className="hero-headline">Equity isn’t wealth until it moves.</p>
-          <p className="hero-support">
-            A compliant, education-first path for homeowners ready to unlock dormant equity and build a self-custodied
-            Bitcoin position — without handing anyone your money or your keys.
-          </p>
-          <div className="hero-actions">
-            <a className="btn btn-primary" href="#equity-iq">
-              Check your Equity IQ
-            </a>
-            <Link className="btn btn-ghost" to="/book">
-              Book free orientation
-            </Link>
+          <div className="hero-copy">
+            <h1 className="hero-brand">
+              Equity<span>2</span>Bitcoin
+            </h1>
+            <p className="hero-headline">Equity isn’t wealth until it moves.</p>
+            <p className="hero-support">
+              A compliant, education-first path for homeowners ready to unlock dormant equity and build a self-custodied
+              Bitcoin position — without handing anyone your money or your keys.
+            </p>
+            <div className="hero-actions">
+              <a className="btn btn-primary" href="#equity-iq">
+                Check your Equity IQ
+              </a>
+              <Link className="btn btn-ghost" to="/book">
+                Book free orientation
+              </Link>
+            </div>
+          </div>
+          <div className="hero-calculator" aria-label="Equity calculator">
+            <EquityCalculator variant="hero" idPrefix="hero" />
           </div>
         </div>
       </section>
