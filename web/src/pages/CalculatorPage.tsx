@@ -8,7 +8,7 @@ export function CalculatorPage() {
         <h1 className="section-title">See what is actually borrowable — and what reaches Bitcoin.</h1>
         <p className="section-lede">
           Paper equity is not tappable equity. This tool applies a lender LTV cap, subtracts the milestone fee, and
-          reserves multi-year interest-only carry from the draw before counting what reaches Bitcoin. Illustrative only.
+          shows monthly carry cost. Illustrative only.
         </p>
         <div style={{ marginTop: "2.5rem" }}>
           <EquityCalculator />

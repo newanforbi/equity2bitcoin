@@ -164,8 +164,7 @@ export function HomePage() {
               </div>
               <p className="fee-note">
                 No fee on Bitcoin performance. No custody. No AUM. If the loan never funds, the success fee never
-                invoices. Less than you borrow reaches Bitcoin — the milestone fee and a multi-year interest reserve
-                come out of the draw first. The full loan balance is still owed.
+                invoices. Less than you borrow reaches Bitcoin — payments are still owed on the full draw.
               </p>
             </Reveal>
             <Reveal className="fee-example">
@@ -181,10 +180,9 @@ export function HomePage() {
                   <dd>{formatUsd(WORKED_EXAMPLE.tappableEquity)}</dd>
                 </div>
                 <div>
-                  <dt>Fee + IO reserve → reaches Bitcoin</dt>
+                  <dt>Success fee → reaches Bitcoin</dt>
                   <dd style={{ fontSize: "1.35rem" }}>
-                    −{formatUsd(WORKED_EXAMPLE.milestoneFee + WORKED_EXAMPLE.interestOnlyReserve)} →{" "}
-                    {formatUsd(WORKED_EXAMPLE.netToBitcoin)}
+                    −{formatUsd(WORKED_EXAMPLE.milestoneFee)} → {formatUsd(WORKED_EXAMPLE.netToBitcoin)}
                   </dd>
                 </div>
               </dl>
@@ -202,8 +200,8 @@ export function HomePage() {
             <p className="eyebrow">Hypothetical walkthrough</p>
             <h2 className="section-title">Paper equity is not borrowable equity.</h2>
             <p className="section-lede">
-              Same household math the calculator uses — LTV cap applied, fee and interest-only reserve subtracted from
-              the draw. Illustrative only — not a promise of loan approval, Bitcoin quantity, or investment outcome.
+              Same household math the calculator uses — LTV cap applied, fee subtracted, carry cost shown. Illustrative
+              only — not a promise of loan approval, Bitcoin quantity, or investment outcome.
             </p>
           </Reveal>
           <Reveal className="case-flow">
