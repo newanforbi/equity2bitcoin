@@ -68,3 +68,18 @@ test("interest-only is less than amortizing payment", () => {
   const interestOnly = (principal * 0.085) / 12;
   assert.ok(interestOnly < amortizingPayment(principal, 8.5, 20));
 });
+
+test("IO reserve comes out of deployable capital", () => {
+  // Default calculator household: $700k / $400k @ 80% LTV, 8.5% APR, 36 mo reserve.
+  const draw = tappable(700_000, 400_000, 0.8);
+  assert.equal(draw, 160_000);
+  const fee = draw * FEE_RATE;
+  const monthlyIo = (draw * 0.085) / 12;
+  const reserve = monthlyIo * 36;
+  const net = draw - fee - reserve;
+  assert.ok(Math.abs(monthlyIo - 1133.3333333333) < 1e-6);
+  assert.ok(Math.abs(reserve - 40_800) < 1e-6);
+  assert.ok(Math.abs(fee - 48_000) < 1e-6);
+  assert.ok(Math.abs(net - 71_200) < 1e-6);
+  assert.ok(net < draw - fee, "reserving IO must reduce capital that reaches Bitcoin");
+});

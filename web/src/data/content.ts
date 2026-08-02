@@ -1,4 +1,4 @@
-import { CALCULATOR_DEFAULTS, MILESTONE_FEE_RATE } from "../config/site";
+import { CALCULATOR_DEFAULTS, INTEREST_ONLY_RESERVE, MILESTONE_FEE_RATE } from "../config/site";
 import { calculateEquity } from "../lib/equity";
 import { formatPercent, formatUsd, formatUsdPrecise } from "../lib/format";
 
@@ -265,12 +265,12 @@ export const CASE_STEPS = [
   { label: "Phases 1–2 education & prep", value: "$0" },
   {
     label: `Phase 3 success fee (${formatPercent(MILESTONE_FEE_RATE)})`,
-    value: formatUsd(WORKED_EXAMPLE.milestoneFee),
+    value: `−${formatUsd(WORKED_EXAMPLE.milestoneFee)}`,
+  },
+  {
+    label: `Interest-only reserve (${INTEREST_ONLY_RESERVE.label}) — ${formatUsdPrecise(WORKED_EXAMPLE.monthlyInterestOnly)} × ${WORKED_EXAMPLE.interestOnlyMonths} mo`,
+    value: `−${formatUsd(WORKED_EXAMPLE.interestOnlyReserve)}`,
   },
   { label: "Reaches Bitcoin", value: formatUsd(WORKED_EXAMPLE.netToBitcoin) },
-  {
-    label: "Interest-only, monthly (2026 – 2029)",
-    value: formatUsdPrecise(WORKED_EXAMPLE.monthlyInterestOnly),
-  },
   { label: "Phases 4–5 Bitcoin education & close", value: "$0" },
 ] as const;

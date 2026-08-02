@@ -38,3 +38,12 @@ export const CALCULATOR_DEFAULTS = {
   aprPercent: 8.5,
   amortizationYears: 20,
 } as const;
+
+/**
+ * Interest-only window reserved from the draw before capital is treated as
+ * deployable to Bitcoin (safer: carry is funded up front, not from income).
+ */
+export const INTEREST_ONLY_RESERVE = {
+  months: 36,
+  label: "2026 – 2029",
+} as const;

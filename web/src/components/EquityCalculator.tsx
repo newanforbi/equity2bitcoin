@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BTC_FUTURE_SCENARIO, BTC_REFERENCE, CALCULATOR_DEFAULTS } from "../config/site";
+import {
+  BTC_FUTURE_SCENARIO,
+  BTC_REFERENCE,
+  CALCULATOR_DEFAULTS,
+  INTEREST_ONLY_RESERVE,
+} from "../config/site";
 import { calculateEquity } from "../lib/equity";
 import { formatBtc, formatPercent, formatUsd, formatUsdPrecise, parseCurrencyInput } from "../lib/format";
 
@@ -135,6 +140,13 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
                   <span>−{formatUsd(result.milestoneFee)}</span>
                 </div>
                 <div className="case-row">
+                  <span>
+                    Interest-only reserve ({INTEREST_ONLY_RESERVE.label}) —{" "}
+                    {formatUsdPrecise(result.monthlyInterestOnly)} × {result.interestOnlyMonths} mo
+                  </span>
+                  <span>−{formatUsd(result.interestOnlyReserve)}</span>
+                </div>
+                <div className="case-row">
                   <span>Reaches Bitcoin</span>
                   <span>{formatUsd(result.netToBitcoin)}</span>
                 </div>
@@ -150,10 +162,6 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
                   </span>
                   <span>{formatUsd(result.illustrativeFutureValueUsd)}</span>
                 </div>
-                <div className="case-row">
-                  <span>Interest-only, monthly (2026 – 2029)</span>
-                  <span>{formatUsdPrecise(result.monthlyInterestOnly)}</span>
-                </div>
                 {!isHero && (
                   <div className="case-row">
                     <span>Fully amortizing over {CALCULATOR_DEFAULTS.amortizationYears} years</span>
@@ -164,12 +172,14 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
 
               {!isHero && (
                 <p className="compliance-strip" style={{ marginTop: "1.5rem" }}>
-                  You would owe <strong>{formatUsd(result.tappableEquity)}</strong> secured against your home, and hold
-                  roughly <strong>{formatUsd(result.netToBitcoin)}</strong> of Bitcoin — because{" "}
-                  {formatUsd(result.milestoneFee)} went to the milestone fee. You start {formatPercent(result.feeRate)}{" "}
-                  behind on day one. At {aprPercent.toFixed(2)}% that is{" "}
-                  <strong>{formatUsdPrecise(result.monthlyInterestOnly)}/month</strong> in interest alone, due
-                  regardless of what Bitcoin does.
+                  You would still owe <strong>{formatUsd(result.tappableEquity)}</strong> secured against your home.
+                  Before counting deployable capital we subtract the milestone fee (
+                  {formatUsd(result.milestoneFee)}) and set aside{" "}
+                  <strong>{formatUsd(result.interestOnlyReserve)}</strong> for{" "}
+                  {result.interestOnlyMonths} months of interest-only carry (
+                  {formatUsdPrecise(result.monthlyInterestOnly)}/mo, {INTEREST_ONLY_RESERVE.label}). That leaves roughly{" "}
+                  <strong>{formatUsd(result.netToBitcoin)}</strong> to Bitcoin — less deployable capital, but the
+                  monthly obligation is funded from the draw up front rather than from income or price appreciation.
                 </p>
               )}
 
