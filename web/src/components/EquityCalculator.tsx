@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BTC_REFERENCE, CALCULATOR_DEFAULTS } from "../config/site";
+import { BTC_FUTURE_SCENARIO, BTC_REFERENCE, CALCULATOR_DEFAULTS } from "../config/site";
 import { calculateEquity } from "../lib/equity";
 import { formatBtc, formatPercent, formatUsd, formatUsdPrecise, parseCurrencyInput } from "../lib/format";
 
@@ -126,6 +126,12 @@ export function EquityCalculator() {
                 <span>{formatBtc(result.illustrativeBtc)}</span>
               </div>
               <div className="case-row">
+                <span>
+                  That BTC at {formatUsd(BTC_FUTURE_SCENARIO.priceUsd)}/BTC ({BTC_FUTURE_SCENARIO.asOf})
+                </span>
+                <span>{formatUsd(result.illustrativeFutureValueUsd)}</span>
+              </div>
+              <div className="case-row">
                 <span>Interest-only, monthly</span>
                 <span>{formatUsdPrecise(result.monthlyInterestOnly)}</span>
               </div>
@@ -157,8 +163,8 @@ export function EquityCalculator() {
 
         <p className="form-note" style={{ marginTop: "1.25rem" }}>
           <strong>Estimate only.</strong> Not a loan offer, pre-qualification, quote, or investment advice. Actual
-          limits, rates, and terms are set solely by your lender. The Bitcoin reference price is a fixed historical
-          figure for illustration — not a live quote or forecast.
+          limits, rates, and terms are set solely by your lender. Bitcoin price lines are fixed illustrative
+          scenarios — not live quotes, and not predictions that any future price will occur.
         </p>
       </div>
     </div>
