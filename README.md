@@ -83,6 +83,17 @@ In `src/config/site.ts`:
 
 ---
 
+## Brand
+
+The mark — a house with a Bitcoin coin inside it — is vector, drawn from the supplied
+logo and recoloured for this site's near-black-and-gold palette. It takes `currentColor`
+for the house outline, so it adapts to whatever it sits on.
+
+See [`brand/README.md`](./brand/README.md) for the source artwork, the colour decisions,
+clear-space rules, and where each asset is used.
+
+---
+
 ## How it's organised
 
 ```

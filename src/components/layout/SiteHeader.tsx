@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
+import { LogoMark } from '../Logo'
+import '../Logo.css'
 import './SiteHeader.css'
 
 const NAV = [
@@ -22,7 +24,7 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="shell site-header__inner">
         <Link to="/" className="site-header__brand" aria-label="Equity2Bitcoin home">
-          <span className="site-header__mark" aria-hidden="true" />
+          <LogoMark size={30} />
           <span className="site-header__wordmark">
             Equity<span className="site-header__two">2</span>Bitcoin
           </span>

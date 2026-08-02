@@ -1,0 +1,19 @@
+.logo-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  color: var(--text-primary);
+  text-decoration: none;
+  line-height: 1;
+}
+
+.logo-lockup__word {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+.logo-lockup__two {
+  color: var(--gold-500);
+}

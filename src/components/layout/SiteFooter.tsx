@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Disclaimer } from '../Disclaimer'
+import { LogoMark } from '../Logo'
 import { SITE } from '../../config/site'
+import '../Logo.css'
 import './SiteFooter.css'
 
 const COLUMNS = [
@@ -38,7 +40,10 @@ export function SiteFooter() {
         <div className="site-footer__top">
           <div className="site-footer__brand">
             <p className="site-footer__wordmark">
-              Equity<span className="site-header__two">2</span>Bitcoin
+              <LogoMark size={26} />
+              <span>
+                Equity<span className="site-header__two">2</span>Bitcoin
+              </span>
             </p>
             <p className="tiny muted">
               Education-first consulting for homeowners considering repositioning dormant

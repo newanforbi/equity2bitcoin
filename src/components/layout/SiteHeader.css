@@ -29,14 +29,6 @@
   flex-shrink: 0;
 }
 
-.site-header__mark {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  background: var(--gold-500);
-  transform: rotate(45deg);
-}
-
 .site-header__two {
   color: var(--gold-500);
 }
