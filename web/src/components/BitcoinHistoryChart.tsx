@@ -52,13 +52,15 @@ export function BitcoinHistoryChart() {
         const points = await loadBtcHistory();
         if (cancelled || !hostRef.current) return;
 
+        const height = Math.min(420, Math.max(300, Math.round(host.clientWidth * 0.42)));
         chart = createChart(host, {
           width: host.clientWidth,
-          height: Math.min(420, Math.max(300, Math.round(host.clientWidth * 0.42))),
+          height,
           layout: {
             background: { type: ColorType.Solid, color: "transparent" },
             textColor: "#cfc7b6",
             fontFamily: "Manrope, system-ui, sans-serif",
+            attributionLogo: false,
           },
           grid: {
             vertLines: { color: "rgba(212, 175, 55, 0.08)" },
@@ -67,16 +69,20 @@ export function BitcoinHistoryChart() {
           rightPriceScale: {
             borderColor: "rgba(212, 175, 55, 0.2)",
             mode: PriceScaleMode.Logarithmic,
+            entireTextOnly: true,
           },
           timeScale: {
             borderColor: "rgba(212, 175, 55, 0.2)",
+            // Keep all-time history readable; page scroll must not zoom the chart.
+            minBarSpacing: 0.05,
           },
           crosshair: {
             vertLine: { color: "rgba(212, 175, 55, 0.35)", labelBackgroundColor: "#1f1c18" },
             horzLine: { color: "rgba(212, 175, 55, 0.35)", labelBackgroundColor: "#1f1c18" },
           },
-          handleScroll: { mouseWheel: true, pressedMouseMove: true },
-          handleScale: { axisPressedMouseMove: true, mouseWheel: true, pinch: true },
+          // Drag to pan; pinch / axis drag to zoom. Wheel stays with the page.
+          handleScroll: { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
+          handleScale: { axisPressedMouseMove: true, mouseWheel: false, pinch: true },
         });
 
         series = chart.addAreaSeries({
@@ -84,15 +90,22 @@ export function BitcoinHistoryChart() {
           topColor: "rgba(212, 175, 55, 0.35)",
           bottomColor: "rgba(212, 175, 55, 0.02)",
           lineWidth: 2,
-          priceFormat: { type: "price", precision: 0, minMove: 1 },
+          priceFormat: {
+            type: "custom",
+            minMove: 0.01,
+            formatter: (price: number) => {
+              if (price >= 1000) return `$${Math.round(price).toLocaleString("en-US")}`;
+              if (price >= 1) return `$${price.toFixed(2)}`;
+              return `$${price.toPrecision(2)}`;
+            },
+          },
         });
 
-        series.setData(
-          points.map((p) => ({
-            time: toChartTime(p.t) as Time,
-            value: p.c,
-          })),
-        );
+        const data = points.map((p) => ({
+          time: toChartTime(p.t) as Time,
+          value: p.c,
+        }));
+        series.setData(data);
 
         const markers: SeriesMarker<Time>[] = [];
         for (const cycle of BTC_CYCLE_ANNOTATIONS) {
@@ -116,9 +129,15 @@ export function BitcoinHistoryChart() {
         markers.sort((a, b) => String(a.time).localeCompare(String(b.time)));
         series.setMarkers(markers);
 
-        chart.timeScale().fitContent();
+        // Force all-time window (2010 → latest), not a zoomed recent slice.
+        chart.timeScale().setVisibleLogicalRange({ from: -2, to: data.length + 2 });
         chartRef.current = chart;
         ro.observe(host);
+        requestAnimationFrame(() => {
+          if (!cancelled && chart) {
+            chart.timeScale().setVisibleLogicalRange({ from: -2, to: data.length + 2 });
+          }
+        });
         setStatus("ready");
       } catch (e) {
         if (!cancelled) {
@@ -151,8 +170,8 @@ export function BitcoinHistoryChart() {
         aria-label="Logarithmic chart of Bitcoin price in US dollars from 2010 through today, with major cycle peaks and troughs marked"
       />
       <p className="btc-history-chart-hint form-note">
-        Log scale · drag to pan · scroll to zoom · USD · static historical snapshot (not a live feed; does not
-        prefill the calculator)
+        Log scale · drag to pan · pinch or drag axis to zoom · USD · static historical snapshot from 2010 (not a live
+        feed; does not prefill the calculator)
       </p>
     </div>
   );
