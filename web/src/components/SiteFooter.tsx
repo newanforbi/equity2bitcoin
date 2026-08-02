@@ -16,7 +16,8 @@ export function SiteFooter() {
           <div className="footer-col">
             <h4>Explore</h4>
             <a href="/#how-it-works">How it works</a>
-            <a href="/#equity-iq">Equity IQ</a>
+            <Link to="/calculator">Calculator</Link>
+            <Link to="/fit">Is this for you</Link>
             <a href="/#fees">Fee model</a>
             <Link to="/book">Book orientation</Link>
           </div>
@@ -34,8 +35,9 @@ export function SiteFooter() {
           </p>
           <p>
             Information on this site is for educational purposes and does not constitute financial, legal, tax, or
-            investment advice. Bitcoin is volatile. Borrowing against a home carries risk. Past performance is not
-            indicative of future results. You retain sole discretion over all financial decisions.
+            investment advice. Bitcoin is highly volatile and has declined more than 80% in past cycles. Borrowing
+            against a home carries risk of foreclosure. Past performance is not indicative of future results. You
+            retain sole discretion over all financial decisions.
           </p>
         </div>
       </div>

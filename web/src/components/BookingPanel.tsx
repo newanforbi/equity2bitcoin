@@ -9,11 +9,49 @@ declare global {
   }
 }
 
+function AcknowledgmentGate({
+  acknowledged,
+  onChange,
+}: {
+  acknowledged: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <div className="compliance-strip" style={{ marginBottom: "1.25rem" }}>
+      <p>
+        <strong>Before you book, please acknowledge:</strong>
+      </p>
+      <ul style={{ margin: "0.75rem 0", paddingLeft: "1.2rem" }}>
+        <li>This call is educational — not investment advice, not a recommendation, and not an offer of credit.</li>
+        <li>
+          Equity2Bitcoin Consulting LLC is not a registered investment adviser, mortgage broker, lender, or money
+          transmitter, and will not take custody of your funds or digital assets.
+        </li>
+        <li>
+          Borrowing against your home puts your property at risk. Bitcoin is highly volatile and has declined more than
+          80% in past market cycles.
+        </li>
+        <li>You should consult your own attorney, accountant, and licensed financial professional before acting.</li>
+      </ul>
+      <label className="form-note" style={{ display: "flex", gap: "0.65rem", alignItems: "flex-start" }}>
+        <input
+          type="checkbox"
+          checked={acknowledged}
+          onChange={(e) => onChange(e.target.checked)}
+          style={{ marginTop: "0.25rem" }}
+        />
+        <span>I have read and understand the above.</span>
+      </label>
+    </div>
+  );
+}
+
 export function BookingPanel() {
   const draft = useMemo(() => loadLeadDraft(), []);
   const calendlyBase = getCalendlyUrl();
   const calendlyUrl = useMemo(() => calendlyUrlWithPrefill(calendlyBase, draft), [calendlyBase, draft]);
 
+  const [acknowledged, setAcknowledged] = useState(false);
   const [name, setName] = useState(draft.name ?? "");
   const [email, setEmail] = useState(draft.email ?? "");
   const [phone, setPhone] = useState(draft.phone ?? "");
@@ -21,7 +59,7 @@ export function BookingPanel() {
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
 
   useEffect(() => {
-    if (!calendlyUrl) return;
+    if (!calendlyUrl || !acknowledged) return;
 
     const parent = document.getElementById("calendly-inline");
     if (!parent) return;
@@ -54,7 +92,7 @@ export function BookingPanel() {
     return () => {
       parent.innerHTML = "";
     };
-  }, [calendlyUrl]);
+  }, [calendlyUrl, acknowledged]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -77,34 +115,31 @@ export function BookingPanel() {
     }
   }
 
-  if (calendlyUrl) {
-    return (
-      <div className="booking-panel">
-        <div id="calendly-inline" className="calendly-embed" />
-      </div>
-    );
-  }
-
   return (
     <div className="booking-panel">
-      <div className="booking-fallback">
-        {status === "done" ? (
-          <div className="form-success">
-            <h3>Request received</h3>
-            <p>
-              Thank you{name ? `, ${name.split(" ")[0]}` : ""}. We will follow up shortly to schedule your free
-              orientation. If you already use Calendly, set <code>VITE_CALENDLY_URL</code> to embed booking
-              directly.
-            </p>
-          </div>
-        ) : (
+      <AcknowledgmentGate acknowledged={acknowledged} onChange={setAcknowledged} />
+
+      {!acknowledged ? (
+        <p className="form-note">Tick the acknowledgment above to load the scheduler.</p>
+      ) : calendlyUrl ? (
+        <div id="calendly-inline" className="calendly-embed" />
+      ) : status === "done" ? (
+        <div className="form-success">
+          <h3>Request received</h3>
+          <p>
+            Thank you{name ? `, ${name.split(" ")[0]}` : ""}. We will follow up shortly to schedule your free
+            orientation. If you already use Calendly, set <code>VITE_CALENDLY_URL</code> to embed booking directly.
+          </p>
+        </div>
+      ) : (
+        <div className="booking-fallback">
           <form onSubmit={onSubmit}>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", marginBottom: "0.35rem" }}>
               Request your orientation
             </h3>
             <p className="form-note">
-              Calendly is not configured yet on this deploy, so this secure request form captures your details.
-              Connect your Calendly link via <code>VITE_CALENDLY_URL</code> for instant self-serve booking.
+              Calendly is not configured yet on this deploy, so this secure request form captures your details. Connect
+              your Calendly link via <code>VITE_CALENDLY_URL</code> for instant self-serve booking.
             </p>
             {draft.quizBand && (
               <div className="score-pill">
@@ -148,8 +183,8 @@ export function BookingPanel() {
               </p>
             )}
           </form>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

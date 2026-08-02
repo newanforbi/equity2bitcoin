@@ -19,10 +19,11 @@ Open [http://localhost:5173](http://localhost:5173).
 | `npm run build` | Typecheck + production build → `dist/` |
 | `npm run preview` | Preview the production build |
 | `npm run typecheck` | TypeScript only |
+| `npm test` | Equity math unit tests |
 
 ## Configuration
 
-See [`SITE.md`](./SITE.md) for env vars and funnel notes.
+See [`SITE.md`](./SITE.md) for env vars and funnel notes. Counsel checklist: [`LEGAL-REVIEW.md`](./LEGAL-REVIEW.md).
 
 Business plan reference: [`Equity2Bitcoin_Business_Plan.pdf`](./Equity2Bitcoin_Business_Plan.pdf).
 

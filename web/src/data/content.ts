@@ -1,3 +1,7 @@
+import { CALCULATOR_DEFAULTS, MILESTONE_FEE_RATE } from "../config/site";
+import { calculateEquity } from "../lib/equity";
+import { formatPercent, formatUsd, formatUsdPrecise } from "../lib/format";
+
 export const BRAND = {
   name: "Equity2Bitcoin",
   legalName: "Equity2Bitcoin Consulting LLC",
@@ -43,30 +47,75 @@ export const PHASES = [
   },
 ] as const;
 
+/** Plan §I volatility acknowledgment — shown on the homepage, not only in legal pages. */
+export const VOLATILITY_STATEMENT =
+  "Bitcoin is highly volatile. Drawdowns of 50% happen regularly. Declines of 80% or more have occurred in every market cycle to date. Any strategy that borrows against your home to acquire it places a fixed, secured obligation against an asset that can lose most of its value — and your home is the collateral. Nothing on this site should be read as a prediction that Bitcoin will rise.";
+
+export const GOOD_FIT = [
+  "You own your home and have meaningful equity beyond the cushion lenders typically require you to keep.",
+  "You can comfortably service an additional monthly payment out of current income — without counting on Bitcoin going up.",
+  "You have a genuinely long horizon and will not need this money back within four to six years.",
+  "You want to understand the mechanics yourself rather than hand decisions to someone else.",
+  "You know Bitcoin falls 50% routinely and have decided that is a risk you can live with.",
+];
+
+export const POOR_FIT = [
+  "You would need to sell Bitcoin to make the loan payment. That combination has ruined people.",
+  "Your income is unstable, or the new payment would stretch your monthly budget.",
+  "You might need the equity for something else soon — renovation, tuition, medical costs, near-term retirement.",
+  "You are behind on your mortgage, or your equity cushion is already thin.",
+  "You want someone to tell you Bitcoin will go up. We will not, because nobody honestly can.",
+  "A 50–80% drawdown in the value of your position would cause real financial or personal distress.",
+];
+
 export const FAQS = [
+  {
+    q: "What exactly am I paying for?",
+    a: "Education, documentation support, and milestone verification across five phases. You are not paying for a loan, for Bitcoin, or for advice about whether to buy it.",
+  },
   {
     q: "Do you handle my loan proceeds or Bitcoin?",
     a: "No. Equity2Bitcoin never takes custody of funds, Bitcoin, or loan instruments. You work with licensed lenders and execute Bitcoin purchases and custody decisions independently.",
   },
   {
-    q: "Is this investment advice?",
-    a: "No. We provide structured education and milestone consulting. We do not make personalized investment recommendations, manage portfolios, or advise on whether Bitcoin is appropriate for your situation.",
+    q: "Do you arrange the loan for me?",
+    a: "No. We are not mortgage brokers or loan originators. We teach what lenders look for and help you assemble a complete package. Choosing the lender and accepting terms stays yours.",
   },
   {
-    q: "When do I pay?",
-    a: "Only after Phase 3 — verified loan approval or funding. The fee is 30% of the equity extracted. Phases 1, 2, 4, and 5 carry no fee.",
+    q: "When do I pay, and how much?",
+    a: `Only after Phase 3 — verified loan approval or funding. The fee is ${formatPercent(MILESTONE_FEE_RATE)} of the equity extracted. Phases 1, 2, 4, and 5 carry no fee.`,
+  },
+  {
+    q: "So less than I borrow actually reaches Bitcoin?",
+    a: `Correct — and this is the most important thing to understand before going further. If you draw $200,000, the fee is $60,000 and $140,000 reaches Bitcoin — but you owe payments on the full $200,000. The calculator shows that subtraction explicitly.`,
+  },
+  {
+    q: "Why is the fee a share of the loan rather than a flat rate?",
+    a: "It scales with engagement size, and it cannot be tied to investment performance — a performance fee would make this an advisory relationship requiring licenses we do not hold. The fee is tied to a verified service milestone, never to what Bitcoin does afterward.",
   },
   {
     q: "What if my loan is denied?",
     a: "There is no success fee without verified extraction. You still keep the educational work product from earlier phases.",
   },
   {
-    q: "Who is this for?",
-    a: "Primarily homeowners roughly ages 35–60 with meaningful tappable equity who want a disciplined, compliance-aware path to learn how equity extraction and Bitcoin ownership can fit together — without giving up control.",
+    q: "What happens if Bitcoin falls after I buy?",
+    a: "You still owe your lender every dollar, on schedule, and your home is the collateral. Bitcoin has fallen more than 50% many times and more than 80% in every cycle so far. If the payment depends on Bitcoin rising, this is not for you.",
   },
   {
-    q: "Is Bitcoin volatile? What about rate risk on a HELOC?",
-    a: "Yes on both counts. Volatility and borrowing costs are real. Our process emphasizes education, timing awareness, and sober risk acknowledgment — never guarantees of return.",
+    q: "Could I lose my home?",
+    a: "A HELOC or cash-out refinance is secured by your home. If you cannot make the payments, the lender has recourse against the property, up to and including foreclosure. That is true of any home-equity borrowing — and especially worth stating when proceeds go into a volatile asset.",
+  },
+  {
+    q: "Are you a registered investment adviser?",
+    a: "No. We do not manage assets or make personalized recommendations about whether Bitcoin belongs in your portfolio. Our services are educational. For tailored advice, speak with a licensed fiduciary.",
+  },
+  {
+    q: "Are you a bank, lender, or money transmitter?",
+    a: "No. We do not lend, originate, broker, hold, or transmit funds or digital assets. We work alongside licensed lenders and established platforms; we are not one.",
+  },
+  {
+    q: "Should I talk to my own accountant or attorney?",
+    a: "Yes. Borrowing against your home to acquire a volatile asset has tax and legal implications specific to your situation. Interest deductibility, in particular, depends on how proceeds are used and is not the same as for home improvement.",
   },
 ] as const;
 
@@ -112,6 +161,16 @@ export const QUIZ_QUESTIONS = [
     ],
   },
   {
+    id: "capacity",
+    prompt: "If Bitcoin fell 80% and stayed there, could you still make the loan payment from income alone?",
+    options: [
+      { label: "No — I would need the asset to recover", value: "depends_on_btc", score: 1 },
+      { label: "Unsure / it would be a stretch", value: "stretch", score: 1 },
+      { label: "Probably, with some budget changes", value: "probably", score: 2 },
+      { label: "Yes — from ordinary income, without selling", value: "yes_income", score: 4 },
+    ],
+  },
+  {
     id: "timeline",
     prompt: "When would you want to take a first concrete step?",
     options: [
@@ -140,17 +199,29 @@ export function scoreQuiz(answers: QuizAnswers): {
     if (selected) score += selected.score;
   }
 
-  if (score >= 16) {
+  const capacity = answers.capacity;
+  if (capacity === "depends_on_btc" || capacity === "stretch") {
+    return {
+      score,
+      max,
+      band: "explore",
+      label: "Not a fit right now — and that is okay",
+      summary:
+        "If the loan payment depends on Bitcoin recovering, this path is the wrong risk for your household. Read “Is this for you,” keep learning, and revisit only if that answer changes.",
+    };
+  }
+
+  if (score >= 20) {
     return {
       score,
       max,
       band: "priority",
       label: "Strong fit for an orientation",
       summary:
-        "Your equity position, timeline, and curiosity suggest a high-signal conversation. Book a free orientation and we will walk the milestone path with clear compliance boundaries.",
+        "Your equity position, payment capacity, and timing suggest a high-signal conversation. Book a free orientation and we will walk the milestone path with clear compliance boundaries.",
     };
   }
-  if (score >= 11) {
+  if (score >= 14) {
     return {
       score,
       max,
@@ -166,15 +237,40 @@ export function scoreQuiz(answers: QuizAnswers): {
     band: "explore",
     label: "Keep learning — then revisit",
     summary:
-      "You may still benefit from the free orientation, especially if equity access or Bitcoin literacy is early-stage. Grab the blueprint and book when timing feels right.",
+      "Equity access, Bitcoin literacy, or timing may still be early-stage. Use the calculator and fit checklist first; book an orientation when the payment-capacity test is a clear yes.",
   };
 }
 
+/**
+ * Corrected worked example for the homepage.
+ * Uses Appendix B-style inputs ($700k / $300k) so the LTV math is honest at 80%.
+ * (Plan §III.F's $700k/$400k → $300k extractable conflates raw equity with tappable.)
+ */
+export const WORKED_EXAMPLE = calculateEquity({
+  homeValue: 700_000,
+  mortgageBalance: 300_000,
+  maxLtv: CALCULATOR_DEFAULTS.maxLtv,
+  aprPercent: CALCULATOR_DEFAULTS.aprPercent,
+  amortizationYears: CALCULATOR_DEFAULTS.amortizationYears,
+});
+
 export const CASE_STEPS = [
-  { label: "Home value", value: "$700,000" },
-  { label: "Remaining mortgage", value: "$400,000" },
-  { label: "Extractable equity (example)", value: "$300,000" },
+  { label: "Home value", value: formatUsd(700_000) },
+  { label: "Remaining mortgage", value: formatUsd(300_000) },
+  { label: "Equity on paper", value: formatUsd(WORKED_EXAMPLE.rawEquity) },
+  {
+    label: `Actually borrowable (${formatPercent(CALCULATOR_DEFAULTS.maxLtv)} LTV)`,
+    value: formatUsd(WORKED_EXAMPLE.tappableEquity),
+  },
   { label: "Phases 1–2 education & prep", value: "$0" },
-  { label: "Phase 3 success fee (30%)", value: "$90,000" },
+  {
+    label: `Phase 3 success fee (${formatPercent(MILESTONE_FEE_RATE)})`,
+    value: formatUsd(WORKED_EXAMPLE.milestoneFee),
+  },
+  { label: "Reaches Bitcoin", value: formatUsd(WORKED_EXAMPLE.netToBitcoin) },
+  {
+    label: "Illustrative monthly interest-only",
+    value: formatUsdPrecise(WORKED_EXAMPLE.monthlyInterestOnly),
+  },
   { label: "Phases 4–5 Bitcoin education & close", value: "$0" },
 ] as const;

@@ -2,8 +2,10 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { BookingPanel } from "../components/BookingPanel";
 import { EquityIQQuiz } from "../components/EquityIQQuiz";
-import { CASE_STEPS, FAQS, PHASES } from "../data/content";
+import { MILESTONE_FEE_RATE } from "../config/site";
+import { CASE_STEPS, FAQS, PHASES, VOLATILITY_STATEMENT, WORKED_EXAMPLE } from "../data/content";
 import { useReveal } from "../hooks/useReveal";
+import { formatPercent, formatUsd } from "../lib/format";
 
 function Reveal({ className = "", children }: { className?: string; children: ReactNode }) {
   const ref = useReveal<HTMLDivElement>();
@@ -126,8 +128,8 @@ export function HomePage() {
             <p className="eyebrow">Qualify in five minutes</p>
             <h2 className="section-title">What’s your Equity IQ?</h2>
             <p className="section-lede">
-              A short readiness check — equity range, ownership tenure, Bitcoin familiarity, and timing. Your result
-              carries into the orientation booking so the conversation starts informed.
+              A short readiness check — equity range, ownership tenure, payment capacity if Bitcoin falls hard, and
+              timing. Your result carries into the orientation booking so the conversation starts informed.
             </p>
           </Reveal>
           <EquityIQQuiz />
@@ -143,30 +145,37 @@ export function HomePage() {
           <div className="fee-band">
             <Reveal>
               <div className="fee-formula">
-                30% milestone fee on <em>equity extracted</em> — only at Phase 3.
+                {formatPercent(MILESTONE_FEE_RATE)} milestone fee on <em>equity extracted</em> — only at Phase 3.
               </div>
               <p className="fee-note">
                 No fee on Bitcoin performance. No custody. No AUM. If the loan never funds, the success fee never
-                invoices. That structure is the product.
+                invoices. Less than you borrow reaches Bitcoin — payments are still owed on the full draw.
               </p>
             </Reveal>
             <Reveal className="fee-example">
               <dl>
                 <div>
-                  <dt>Example extraction</dt>
-                  <dd>$300,000</dd>
+                  <dt>Worked example ({formatPercent(0.8)} LTV)</dt>
+                  <dd style={{ fontSize: "1.15rem" }}>
+                    {formatUsd(700_000)} home · {formatUsd(300_000)} owed
+                  </dd>
                 </div>
                 <div>
-                  <dt>Success fee</dt>
-                  <dd>$90,000</dd>
+                  <dt>Actually borrowable</dt>
+                  <dd>{formatUsd(WORKED_EXAMPLE.tappableEquity)}</dd>
                 </div>
                 <div>
-                  <dt>Due when</dt>
-                  <dd style={{ fontSize: "1.25rem" }}>Verified approval / funding</dd>
+                  <dt>Success fee → reaches Bitcoin</dt>
+                  <dd style={{ fontSize: "1.35rem" }}>
+                    −{formatUsd(WORKED_EXAMPLE.milestoneFee)} → {formatUsd(WORKED_EXAMPLE.netToBitcoin)}
+                  </dd>
                 </div>
               </dl>
             </Reveal>
           </div>
+          <p className="compliance-strip" style={{ marginTop: "1.5rem" }}>
+            {VOLATILITY_STATEMENT}
+          </p>
         </div>
       </section>
 
@@ -174,9 +183,10 @@ export function HomePage() {
         <div className="container">
           <Reveal>
             <p className="eyebrow">Hypothetical walkthrough</p>
-            <h2 className="section-title">One household, five phases, full autonomy.</h2>
+            <h2 className="section-title">Paper equity is not borrowable equity.</h2>
             <p className="section-lede">
-              Illustrative only — not a promise of loan approval, Bitcoin quantity, or investment outcome.
+              Same household math the calculator uses — LTV cap applied, fee subtracted, carry cost shown. Illustrative
+              only — not a promise of loan approval, Bitcoin quantity, or investment outcome.
             </p>
           </Reveal>
           <Reveal className="case-flow">
@@ -187,6 +197,14 @@ export function HomePage() {
               </div>
             ))}
           </Reveal>
+          <div className="hero-actions" style={{ marginTop: "1.75rem" }}>
+            <Link className="btn btn-ghost" to="/calculator">
+              Run your numbers
+            </Link>
+            <Link className="btn btn-ghost" to="/fit">
+              Is this for you?
+            </Link>
+          </div>
         </div>
       </section>
 

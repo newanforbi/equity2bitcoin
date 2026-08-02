@@ -92,9 +92,25 @@ export function EquityIQQuiz() {
           <h3>{result.label}</h3>
           <p>{result.summary}</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
-            <Link to="/book" className="btn btn-primary">
-              Book free orientation
-            </Link>
+            {result.band === "explore" ? (
+              <>
+                <Link to="/fit" className="btn btn-primary">
+                  Read “Is this for you”
+                </Link>
+                <Link to="/calculator" className="btn btn-ghost">
+                  Run the calculator
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/book" className="btn btn-primary">
+                  Book free orientation
+                </Link>
+                <Link to="/calculator" className="btn btn-ghost">
+                  Run the calculator
+                </Link>
+              </>
+            )}
             <button type="button" className="btn btn-ghost" onClick={reset}>
               Retake quiz
             </button>
