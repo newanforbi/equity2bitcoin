@@ -87,7 +87,7 @@ export const FAQS = [
   },
   {
     q: "So less than I borrow actually reaches Bitcoin?",
-    a: `Correct — and this is the most important thing to understand before going further. If you draw $200,000, the fee is $60,000 and $140,000 reaches Bitcoin — but you owe payments on the full $200,000. The calculator shows that subtraction explicitly.`,
+    a: `Correct — and this is the most important thing to understand before going further. From the draw we subtract the milestone fee and set aside multi-year interest-only carry (${INTEREST_ONLY_RESERVE.label}) before counting capital as deployable to Bitcoin. You still owe payments on the full draw; reserving carry up front is the safer framing. The calculator shows that subtraction explicitly.`,
   },
   {
     q: "Why is the fee a share of the loan rather than a flat rate?",
