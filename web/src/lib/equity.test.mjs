@@ -68,3 +68,16 @@ test("interest-only is less than amortizing payment", () => {
   const interestOnly = (principal * 0.085) / 12;
   assert.ok(interestOnly < amortizingPayment(principal, 8.5, 20));
 });
+
+test("pre-pay interest toggle reduces deployable capital", () => {
+  const draw = tappable(700_000, 400_000, 0.8);
+  const fee = draw * FEE_RATE;
+  const monthlyIo = (draw * 0.085) / 12;
+  const reserve = monthlyIo * 36;
+  const withoutPrepay = draw - fee;
+  const withPrepay = draw - fee - reserve;
+  assert.equal(draw, 160_000);
+  assert.ok(Math.abs(withoutPrepay - 112_000) < 1e-6);
+  assert.ok(Math.abs(withPrepay - 71_200) < 1e-6);
+  assert.ok(withPrepay < withoutPrepay);
+});
