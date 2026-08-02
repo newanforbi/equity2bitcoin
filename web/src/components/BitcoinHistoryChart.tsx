@@ -24,9 +24,10 @@ function yearFromTime(time: Time): number {
 }
 
 /** Year-only ticks on the all-time view — month/day labels were crowding 2020–2026. */
-function btcHistoryTickMarkFormatter(time: Time, tickMarkType: TickMarkType): string | null {
+function btcHistoryTickMarkFormatter(time: Time, tickMarkType: TickMarkType): string {
+  // Return "" to hide a tick. `null` falls back to the library default (e.g. "Apr").
   if (tickMarkType === TickMarkType.Year) return String(yearFromTime(time));
-  return null;
+  return "";
 }
 
 function nearestPoint(points: BtcHistoryPoint[], target: number): BtcHistoryPoint {
