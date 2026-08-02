@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
 const links = [
+  { href: "/#bitcoin-history", label: "Bitcoin history" },
   { href: "/#how-it-works", label: "How it works" },
   { to: "/calculator", label: "Calculator" },
   { to: "/fit", label: "Is this for you" },
