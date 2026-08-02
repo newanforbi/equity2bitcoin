@@ -829,6 +829,65 @@ p {
   max-width: 52rem;
 }
 
+.btc-history {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(212, 175, 55, 0.07), transparent 55%),
+    linear-gradient(180deg, rgba(20, 18, 16, 0.55), transparent 40%),
+    var(--ink);
+}
+
+.btc-history-overlay-note {
+  margin: 1.75rem 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  color: var(--gold-soft);
+  letter-spacing: 0.01em;
+}
+
+.btc-history-chart {
+  margin-top: 0.5rem;
+}
+
+.btc-history-chart-canvas {
+  width: 100%;
+  min-height: 300px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.btc-history-chart-hint {
+  margin-top: 0.65rem;
+}
+
+.btc-history-callouts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.75rem 2rem;
+  margin-top: 2rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.btc-history-callout h3 {
+  font-size: 1.85rem;
+  color: var(--cream);
+  margin: 0.35rem 0 0.55rem;
+}
+
+.btc-history-callout p:last-child {
+  color: var(--cream-muted);
+  font-size: 0.95rem;
+  max-width: 28rem;
+}
+
+.btc-history-disclaimer {
+  margin-top: 1.75rem;
+}
+
+.btc-history-disclaimer strong {
+  color: var(--cream);
+}
+
 .site-footer {
   border-top: 1px solid var(--line);
   padding: 3rem 0 2.5rem;
@@ -977,7 +1036,8 @@ p {
   .quiz-shell,
   .fee-band,
   .booking-grid,
-  .footer-grid {
+  .footer-grid,
+  .btc-history-callouts {
     grid-template-columns: 1fr;
   }
 

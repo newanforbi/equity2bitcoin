@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { BitcoinHistorySection } from "../components/BitcoinHistorySection";
 import { BookingPanel } from "../components/BookingPanel";
 import { EquityCalculator } from "../components/EquityCalculator";
 import { EquityIQQuiz } from "../components/EquityIQQuiz";
@@ -119,6 +120,8 @@ export function HomePage() {
           </Reveal>
         </div>
       </section>
+
+      <BitcoinHistorySection />
 
       <section className="section" id="how-it-works">
         <div className="container">

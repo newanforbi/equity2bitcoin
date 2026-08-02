@@ -21,6 +21,7 @@ export function SiteFooter() {
           </div>
           <div className="footer-col">
             <h4>Explore</h4>
+            <a href="/#bitcoin-history">Bitcoin history</a>
             <a href="/#how-it-works">How it works</a>
             <Link to="/calculator">Calculator</Link>
             <Link to="/fit">Is this for you</Link>
