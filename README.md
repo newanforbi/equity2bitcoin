@@ -2,8 +2,6 @@
   <img src="./web/public/logo-equity2bitcoin.png" alt="Equity2Bitcoin" width="420" />
 </p>
 
-<h1 align="center">Equity2Bitcoin</h1>
-
 <p align="center">
   <strong>Equity isn’t wealth until it moves.</strong><br />
   Educational consulting that helps homeowners understand how to unlock dormant home equity<br />
