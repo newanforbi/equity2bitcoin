@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BTC_FUTURE_SCENARIO, BTC_REFERENCE, CALCULATOR_DEFAULTS } from "../config/site";
+import {
+  BTC_FUTURE_SCENARIO,
+  BTC_REFERENCE,
+  CALCULATOR_DEFAULTS,
+  INTEREST_ONLY_RESERVE,
+} from "../config/site";
 import { calculateEquity } from "../lib/equity";
 import { formatBtc, formatPercent, formatUsd, formatUsdPrecise, parseCurrencyInput } from "../lib/format";
 
@@ -16,6 +21,7 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
   const [mortgageBalance, setMortgageBalance] = useState<number>(CALCULATOR_DEFAULTS.mortgageBalance);
   const [maxLtv, setMaxLtv] = useState<number>(CALCULATOR_DEFAULTS.maxLtv);
   const [aprPercent, setAprPercent] = useState<number>(CALCULATOR_DEFAULTS.aprPercent);
+  const [prepayInterest, setPrepayInterest] = useState(false);
   const isHero = variant === "hero";
 
   const result = useMemo(
@@ -26,8 +32,9 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
         maxLtv,
         aprPercent,
         amortizationYears: CALCULATOR_DEFAULTS.amortizationYears,
+        prepayInterest,
       }),
-    [homeValue, mortgageBalance, maxLtv, aprPercent],
+    [homeValue, mortgageBalance, maxLtv, aprPercent, prepayInterest],
   );
 
   return (
@@ -125,6 +132,34 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
                 so the borrowable figure is lower.
               </p>
 
+              <div
+                className="calc-mode-toggle"
+                role="group"
+                aria-label="Interest handling for deployable capital"
+              >
+                <button
+                  type="button"
+                  className={!prepayInterest ? "is-active" : undefined}
+                  aria-pressed={!prepayInterest}
+                  onClick={() => setPrepayInterest(false)}
+                >
+                  Pay interest monthly
+                </button>
+                <button
+                  type="button"
+                  className={prepayInterest ? "is-active" : undefined}
+                  aria-pressed={prepayInterest}
+                  onClick={() => setPrepayInterest(true)}
+                >
+                  Pre-pay interest
+                </button>
+              </div>
+              <p className="form-note calc-mode-note">
+                {prepayInterest
+                  ? `Safer path: set aside ${result.interestOnlyMonths} months of interest-only carry (${INTEREST_ONLY_RESERVE.label}) from the draw before counting what reaches Bitcoin.`
+                  : `Default path: only the milestone fee comes out of the draw. You fund ${formatUsdPrecise(result.monthlyInterestOnly)}/mo in interest from income during ${INTEREST_ONLY_RESERVE.label}.`}
+              </p>
+
               <div className="case-flow" style={{ marginTop: isHero ? "1rem" : "1.5rem" }}>
                 <div className="case-row">
                   <span>Amount drawn from your lender</span>
@@ -134,6 +169,20 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
                   <span>Milestone fee ({formatPercent(result.feeRate)})</span>
                   <span>−{formatUsd(result.milestoneFee)}</span>
                 </div>
+                {prepayInterest ? (
+                  <div className="case-row">
+                    <span>
+                      Interest-only reserve ({INTEREST_ONLY_RESERVE.label}) —{" "}
+                      {formatUsdPrecise(result.monthlyInterestOnly)} × {result.interestOnlyMonths} mo
+                    </span>
+                    <span>−{formatUsd(result.interestOnlyReserve)}</span>
+                  </div>
+                ) : (
+                  <div className="case-row">
+                    <span>Interest-only, monthly ({INTEREST_ONLY_RESERVE.label})</span>
+                    <span>{formatUsdPrecise(result.monthlyInterestOnly)}</span>
+                  </div>
+                )}
                 <div className="case-row">
                   <span>Reaches Bitcoin</span>
                   <span>{formatUsd(result.netToBitcoin)}</span>
@@ -150,10 +199,6 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
                   </span>
                   <span>{formatUsd(result.illustrativeFutureValueUsd)}</span>
                 </div>
-                <div className="case-row">
-                  <span>Interest-only, monthly (2026 – 2029)</span>
-                  <span>{formatUsdPrecise(result.monthlyInterestOnly)}</span>
-                </div>
                 {!isHero && (
                   <div className="case-row">
                     <span>Fully amortizing over {CALCULATOR_DEFAULTS.amortizationYears} years</span>
@@ -164,12 +209,24 @@ export function EquityCalculator({ idPrefix = "calc", variant = "page" }: Equity
 
               {!isHero && (
                 <p className="compliance-strip" style={{ marginTop: "1.5rem" }}>
-                  You would owe <strong>{formatUsd(result.tappableEquity)}</strong> secured against your home, and hold
-                  roughly <strong>{formatUsd(result.netToBitcoin)}</strong> of Bitcoin — because{" "}
-                  {formatUsd(result.milestoneFee)} went to the milestone fee. You start {formatPercent(result.feeRate)}{" "}
-                  behind on day one. At {aprPercent.toFixed(2)}% that is{" "}
-                  <strong>{formatUsdPrecise(result.monthlyInterestOnly)}/month</strong> in interest alone, due
-                  regardless of what Bitcoin does.
+                  You would still owe <strong>{formatUsd(result.tappableEquity)}</strong> secured against your home.
+                  {prepayInterest ? (
+                    <>
+                      {" "}
+                      With pre-pay selected, the milestone fee ({formatUsd(result.milestoneFee)}) and{" "}
+                      <strong>{formatUsd(result.interestOnlyReserve)}</strong> of interest-only carry are set aside from
+                      the draw, leaving roughly <strong>{formatUsd(result.netToBitcoin)}</strong> to Bitcoin — less
+                      deployable capital, but monthly interest for {INTEREST_ONLY_RESERVE.label} is funded up front.
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      About <strong>{formatUsd(result.netToBitcoin)}</strong> reaches Bitcoin after the{" "}
+                      {formatUsd(result.milestoneFee)} milestone fee. At {aprPercent.toFixed(2)}% that is{" "}
+                      <strong>{formatUsdPrecise(result.monthlyInterestOnly)}/month</strong> in interest alone, due
+                      regardless of what Bitcoin does.
+                    </>
+                  )}
                 </p>
               )}
 

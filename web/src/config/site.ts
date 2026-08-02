@@ -38,3 +38,12 @@ export const CALCULATOR_DEFAULTS = {
   aprPercent: 8.5,
   amortizationYears: 20,
 } as const;
+
+/**
+ * Optional interest-only window that can be reserved from the draw before
+ * counting capital as deployable to Bitcoin (calculator toggle).
+ */
+export const INTEREST_ONLY_RESERVE = {
+  months: 36,
+  label: "2026 – 2029",
+} as const;

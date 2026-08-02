@@ -3,7 +3,12 @@
  * Pure functions only — every page that shows a dollar figure should import from here.
  */
 
-import { BTC_FUTURE_SCENARIO, BTC_REFERENCE, MILESTONE_FEE_RATE } from "../config/site";
+import {
+  BTC_FUTURE_SCENARIO,
+  BTC_REFERENCE,
+  INTEREST_ONLY_RESERVE,
+  MILESTONE_FEE_RATE,
+} from "../config/site";
 
 export interface EquityInputs {
   homeValue: number;
@@ -12,6 +17,11 @@ export interface EquityInputs {
   maxLtv: number;
   aprPercent: number;
   amortizationYears: number;
+  /**
+   * When true, reserve INTEREST_ONLY_RESERVE.months of interest-only carry from
+   * the draw before counting capital as deployable to Bitcoin.
+   */
+  prepayInterest?: boolean;
 }
 
 export interface EquityResult {
@@ -20,6 +30,12 @@ export interface EquityResult {
   /** (value × maxLtv) − mortgage — what is typically borrowable. */
   tappableEquity: number;
   milestoneFee: number;
+  /** monthlyInterestOnly × INTEREST_ONLY_RESERVE.months (always computed). */
+  interestOnlyReserve: number;
+  interestOnlyMonths: number;
+  /** Whether the IO reserve was subtracted from deployable capital. */
+  prepayInterest: boolean;
+  /** Draw − fee (− IO reserve when prepaying) — capital treated as deployable to Bitcoin. */
   netToBitcoin: number;
   illustrativeBtc: number;
   /** Same BTC quantity valued at BTC_FUTURE_SCENARIO — not a forecast. */
@@ -54,12 +70,16 @@ export function calculateEquity(inputs: EquityInputs): EquityResult {
   const maxLtv = Number.isFinite(inputs.maxLtv) ? inputs.maxLtv : 0;
   const aprPercent = Number.isFinite(inputs.aprPercent) ? Math.max(0, inputs.aprPercent) : 0;
   const years = Math.max(1, inputs.amortizationYears);
+  const prepayInterest = Boolean(inputs.prepayInterest);
+  const interestOnlyMonths = INTEREST_ONLY_RESERVE.months;
 
   const rawEquity = clampMoney(homeValue - mortgageBalance);
   const tappableEquity = clampMoney(homeValue * maxLtv - mortgageBalance);
   const milestoneFee = tappableEquity * MILESTONE_FEE_RATE;
-  const netToBitcoin = tappableEquity - milestoneFee;
   const monthlyInterestOnly = (tappableEquity * (aprPercent / 100)) / 12;
+  const interestOnlyReserve = monthlyInterestOnly * interestOnlyMonths;
+  const reservedCarry = prepayInterest ? interestOnlyReserve : 0;
+  const netToBitcoin = clampMoney(tappableEquity - milestoneFee - reservedCarry);
   const monthlyAmortizing = amortizingPayment(tappableEquity, aprPercent, years);
   const totalInterestOverTerm = clampMoney(monthlyAmortizing * years * 12 - tappableEquity);
 
@@ -69,6 +89,9 @@ export function calculateEquity(inputs: EquityInputs): EquityResult {
     rawEquity,
     tappableEquity,
     milestoneFee,
+    interestOnlyReserve,
+    interestOnlyMonths,
+    prepayInterest,
     netToBitcoin,
     illustrativeBtc,
     illustrativeFutureValueUsd: illustrativeBtc * BTC_FUTURE_SCENARIO.priceUsd,
