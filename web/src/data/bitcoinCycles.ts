@@ -1,6 +1,6 @@
 /** Educational cycle markers for the historical BTC chart — not forecasts. */
 
-import { BTC_FUTURE_SCENARIO } from "../config/site";
+import { BTC_FUTURE_SCENARIO, BTC_REFERENCE } from "../config/site";
 
 export type BtcHistoryPoint = {
   /** Unix seconds (UTC) */
@@ -9,15 +9,40 @@ export type BtcHistoryPoint = {
   c: number;
 };
 
-/** Nov 1 of the future-scenario year — matches calculator wording, not a forecast date. */
-export const BTC_PROJECTION_END = {
+export type BtcProjectionWaypoint = {
+  time: number;
+  priceUsd: number;
+  label: string;
+  /** Marker placement on the dashed series */
+  position: "aboveBar" | "belowBar";
+  color: string;
+  shape: "arrowUp" | "arrowDown" | "circle";
+};
+
+/** End-of-year 2026 illustrative low — same $35k reference the calculator uses. */
+export const BTC_PROJECTION_YEAR_END_LOW: BtcProjectionWaypoint = {
+  time: Date.UTC(2026, 11, 31) / 1000,
+  priceUsd: BTC_REFERENCE.priceUsd,
+  label: `2026 low $${(BTC_REFERENCE.priceUsd / 1000).toFixed(0)}k`,
+  position: "belowBar",
+  color: "#c45c4a",
+  shape: "arrowUp",
+};
+
+/** Nov 2029 illustrative high — same $450k scenario the calculator uses. */
+export const BTC_PROJECTION_END: BtcProjectionWaypoint = {
   time: Date.UTC(2029, 10, 1) / 1000,
   priceUsd: BTC_FUTURE_SCENARIO.priceUsd,
   label: `2029 scenario $${(BTC_FUTURE_SCENARIO.priceUsd / 1000).toFixed(0)}k`,
-} as const;
+  position: "aboveBar",
+  color: "#e0c56a",
+  shape: "arrowDown",
+};
 
-/** Mid-horizon year tick on the projection segment (axis / marker only). */
-export const BTC_PROJECTION_MID_YEAR = 2027;
+export const BTC_PROJECTION_WAYPOINTS: BtcProjectionWaypoint[] = [
+  BTC_PROJECTION_YEAR_END_LOW,
+  BTC_PROJECTION_END,
+];
 
 export type BtcCycleAnnotation = {
   id: string;
@@ -104,29 +129,46 @@ export function toChartTime(unixSeconds: number): string {
   return `${y}-${m}-${day}`;
 }
 
+function appendLogLinearSegment(
+  out: BtcHistoryPoint[],
+  from: BtcHistoryPoint,
+  to: BtcHistoryPoint,
+  weekSec: number,
+): void {
+  if (to.t <= from.t || from.c <= 0 || to.c <= 0) {
+    out.push(to);
+    return;
+  }
+  const log0 = Math.log(from.c);
+  const log1 = Math.log(to.c);
+  const span = to.t - from.t;
+  for (let t = from.t + weekSec; t < to.t; t += weekSec) {
+    const u = (t - from.t) / span;
+    out.push({ t, c: Math.exp(log0 + u * (log1 - log0)) });
+  }
+  out.push(to);
+}
+
 /**
- * Dashed extension from the last historical close to the illustrative 2029 scenario.
- * Log-linear path so it reads cleanly on the log chart. Not a forecast — same $450k
- * arithmetic the calculator uses.
+ * Dashed extension: last close → illustrative end-2026 $35k low → 2029 $450k scenario.
+ * Log-linear between waypoints so it reads cleanly on the log chart. Not a forecast —
+ * same fixed prices the calculator uses.
  */
 export function buildIllustrativeProjection(history: BtcHistoryPoint[]): BtcHistoryPoint[] {
   if (history.length === 0) return [];
   const start = history[history.length - 1];
-  const endT = BTC_PROJECTION_END.time;
-  const endP = BTC_PROJECTION_END.priceUsd;
-  if (endT <= start.t || start.c <= 0) return [start];
+  if (start.c <= 0) return [start];
 
   const weekSec = 7 * 86_400;
   const out: BtcHistoryPoint[] = [{ t: start.t, c: start.c }];
-  const log0 = Math.log(start.c);
-  const log1 = Math.log(endP);
-  const span = endT - start.t;
+  let prev = out[0];
 
-  for (let t = start.t + weekSec; t < endT; t += weekSec) {
-    const u = (t - start.t) / span;
-    out.push({ t, c: Math.exp(log0 + u * (log1 - log0)) });
+  for (const wp of BTC_PROJECTION_WAYPOINTS) {
+    if (wp.time <= prev.t) continue;
+    const next = { t: wp.time, c: wp.priceUsd };
+    appendLogLinearSegment(out, prev, next, weekSec);
+    prev = next;
   }
-  out.push({ t: endT, c: endP });
   return out;
 }
 

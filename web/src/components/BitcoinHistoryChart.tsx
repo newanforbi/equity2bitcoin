@@ -10,11 +10,10 @@ import {
   PriceScaleMode,
   TickMarkType,
 } from "lightweight-charts";
-import { BTC_FUTURE_SCENARIO } from "../config/site";
+import { BTC_FUTURE_SCENARIO, BTC_REFERENCE } from "../config/site";
 import {
   BTC_CYCLE_ANNOTATIONS,
-  BTC_PROJECTION_END,
-  BTC_PROJECTION_MID_YEAR,
+  BTC_PROJECTION_WAYPOINTS,
   buildIllustrativeProjection,
   downsampleToWeekly,
   loadBtcHistory,
@@ -183,24 +182,15 @@ export function BitcoinHistoryChart() {
         markers.sort((a, b) => String(a.time).localeCompare(String(b.time)));
         historySeries.setMarkers(markers);
 
-        const midTarget = Date.UTC(BTC_PROJECTION_MID_YEAR, 0, 1) / 1000;
-        const mid = nearestPoint(projection, midTarget);
-        projectionSeries.setMarkers([
-          {
-            time: toChartTime(mid.t) as Time,
-            position: "aboveBar",
-            color: "rgba(224, 197, 106, 0.95)",
-            shape: "circle",
-            text: String(BTC_PROJECTION_MID_YEAR),
-          },
-          {
-            time: toChartTime(BTC_PROJECTION_END.time) as Time,
-            position: "aboveBar",
-            color: "#e0c56a",
-            shape: "arrowDown",
-            text: `${BTC_PROJECTION_END.label} (illustrative)`,
-          },
-        ]);
+        projectionSeries.setMarkers(
+          BTC_PROJECTION_WAYPOINTS.map((wp) => ({
+            time: toChartTime(wp.time) as Time,
+            position: wp.position,
+            color: wp.color,
+            shape: wp.shape,
+            text: `${wp.label} (illustrative)`,
+          })),
+        );
 
         // History + dashed projection through 2029. Wheel zoom is off so page scroll cannot crop this.
         chart.timeScale().fitContent();
@@ -238,12 +228,13 @@ export function BitcoinHistoryChart() {
         ref={hostRef}
         className="btc-history-chart-canvas"
         role="img"
-        aria-label={`Logarithmic Bitcoin USD history from 2010 with an illustrative dashed projection to ${BTC_FUTURE_SCENARIO.asOf} at ${formatAxisPrice(BTC_FUTURE_SCENARIO.priceUsd)}, not a forecast`}
+        aria-label={`Logarithmic Bitcoin USD history from 2010 with an illustrative dashed projection to a ${formatAxisPrice(BTC_REFERENCE.priceUsd)} end-of-2026 low and ${formatAxisPrice(BTC_FUTURE_SCENARIO.priceUsd)} in ${BTC_FUTURE_SCENARIO.asOf}, not a forecast`}
       />
       <p className="btc-history-chart-hint form-note">
-        Log scale · weekly closes · solid = history · dashed = illustrative path to{" "}
-        {formatAxisPrice(BTC_FUTURE_SCENARIO.priceUsd)} in {BTC_FUTURE_SCENARIO.asOf} (same scenario as the calculator —
-        not a forecast; does not prefill the calculator)
+        Log scale · weekly closes · solid = history · dashed = illustrative path through{" "}
+        {formatAxisPrice(BTC_REFERENCE.priceUsd)} by end of 2026, then{" "}
+        {formatAxisPrice(BTC_FUTURE_SCENARIO.priceUsd)} in {BTC_FUTURE_SCENARIO.asOf} (same fixed prices as the
+        calculator — not a forecast; does not prefill the calculator)
       </p>
     </div>
   );
