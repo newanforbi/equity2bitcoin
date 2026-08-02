@@ -4,13 +4,18 @@ import {
   createChart,
   type IChartApi,
   type ISeriesApi,
+  LineStyle,
   type SeriesMarker,
   type Time,
   PriceScaleMode,
   TickMarkType,
 } from "lightweight-charts";
+import { BTC_FUTURE_SCENARIO } from "../config/site";
 import {
   BTC_CYCLE_ANNOTATIONS,
+  BTC_PROJECTION_END,
+  BTC_PROJECTION_MID_YEAR,
+  buildIllustrativeProjection,
   downsampleToWeekly,
   loadBtcHistory,
   toChartTime,
@@ -43,6 +48,12 @@ function nearestPoint(points: BtcHistoryPoint[], target: number): BtcHistoryPoin
   return best;
 }
 
+function formatAxisPrice(price: number): string {
+  if (price >= 1000) return `$${Math.round(price).toLocaleString("en-US")}`;
+  if (price >= 1) return `$${price.toFixed(2)}`;
+  return `$${price.toPrecision(2)}`;
+}
+
 export function BitcoinHistoryChart() {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -54,7 +65,6 @@ export function BitcoinHistoryChart() {
     if (!host) return;
 
     let cancelled = false;
-    let series: ISeriesApi<"Area"> | null = null;
     let chart: IChartApi | null = null;
 
     const ro = new ResizeObserver(() => {
@@ -67,6 +77,7 @@ export function BitcoinHistoryChart() {
         const rawPoints = await loadBtcHistory();
         // Uniform weekly bars → calendar years get roughly equal width on the x-axis.
         const points = downsampleToWeekly(rawPoints);
+        const projection = buildIllustrativeProjection(points);
         if (cancelled || !hostRef.current) return;
 
         const height = Math.min(420, Math.max(300, Math.round(host.clientWidth * 0.42)));
@@ -106,31 +117,49 @@ export function BitcoinHistoryChart() {
           handleScale: { axisPressedMouseMove: true, mouseWheel: false, pinch: true },
         });
 
-        series = chart.addAreaSeries({
+        const priceFormat = {
+          type: "custom" as const,
+          minMove: 0.01,
+          formatter: formatAxisPrice,
+        };
+
+        // Include the illustrative $450k scenario in the log window.
+        const autoscaleInfoProvider = () => ({
+          priceRange: { minValue: 0.05, maxValue: 550_000 },
+        });
+
+        const historySeries: ISeriesApi<"Area"> = chart.addAreaSeries({
           lineColor: "#d4af37",
           topColor: "rgba(212, 175, 55, 0.35)",
           bottomColor: "rgba(212, 175, 55, 0.02)",
           lineWidth: 2,
-          priceFormat: {
-            type: "custom",
-            minMove: 0.01,
-            formatter: (price: number) => {
-              if (price >= 1000) return `$${Math.round(price).toLocaleString("en-US")}`;
-              if (price >= 1) return `$${price.toFixed(2)}`;
-              return `$${price.toPrecision(2)}`;
-            },
-          },
-          // Clamp log autoscale so marker labels don't push the axis into multi-million nonsense.
-          autoscaleInfoProvider: () => ({
-            priceRange: { minValue: 0.05, maxValue: 250_000 },
-          }),
+          priceFormat,
+          autoscaleInfoProvider,
         });
 
-        const data = points.map((p) => ({
-          time: toChartTime(p.t) as Time,
-          value: p.c,
-        }));
-        series.setData(data);
+        const projectionSeries: ISeriesApi<"Line"> = chart.addLineSeries({
+          color: "rgba(224, 197, 106, 0.75)",
+          lineWidth: 2,
+          lineStyle: LineStyle.Dashed,
+          priceFormat,
+          autoscaleInfoProvider,
+          lastValueVisible: true,
+          priceLineVisible: false,
+          crosshairMarkerVisible: true,
+        });
+
+        historySeries.setData(
+          points.map((p) => ({
+            time: toChartTime(p.t) as Time,
+            value: p.c,
+          })),
+        );
+        projectionSeries.setData(
+          projection.map((p) => ({
+            time: toChartTime(p.t) as Time,
+            value: p.c,
+          })),
+        );
 
         const markers: SeriesMarker<Time>[] = [];
         for (const cycle of BTC_CYCLE_ANNOTATIONS) {
@@ -152,9 +181,28 @@ export function BitcoinHistoryChart() {
           });
         }
         markers.sort((a, b) => String(a.time).localeCompare(String(b.time)));
-        series.setMarkers(markers);
+        historySeries.setMarkers(markers);
 
-        // All-time window (2010 → latest). Wheel zoom is off so page scroll cannot crop this.
+        const midTarget = Date.UTC(BTC_PROJECTION_MID_YEAR, 0, 1) / 1000;
+        const mid = nearestPoint(projection, midTarget);
+        projectionSeries.setMarkers([
+          {
+            time: toChartTime(mid.t) as Time,
+            position: "aboveBar",
+            color: "rgba(224, 197, 106, 0.95)",
+            shape: "circle",
+            text: String(BTC_PROJECTION_MID_YEAR),
+          },
+          {
+            time: toChartTime(BTC_PROJECTION_END.time) as Time,
+            position: "aboveBar",
+            color: "#e0c56a",
+            shape: "arrowDown",
+            text: `${BTC_PROJECTION_END.label} (illustrative)`,
+          },
+        ]);
+
+        // History + dashed projection through 2029. Wheel zoom is off so page scroll cannot crop this.
         chart.timeScale().fitContent();
         chartRef.current = chart;
         ro.observe(host);
@@ -190,11 +238,12 @@ export function BitcoinHistoryChart() {
         ref={hostRef}
         className="btc-history-chart-canvas"
         role="img"
-        aria-label="Logarithmic chart of Bitcoin price in US dollars from 2010 through today, with major cycle peaks and troughs marked"
+        aria-label={`Logarithmic Bitcoin USD history from 2010 with an illustrative dashed projection to ${BTC_FUTURE_SCENARIO.asOf} at ${formatAxisPrice(BTC_FUTURE_SCENARIO.priceUsd)}, not a forecast`}
       />
       <p className="btc-history-chart-hint form-note">
-        Log scale · weekly closes · drag to pan · pinch or drag axis to zoom · USD · static snapshot from 2010 (not a
-        live feed; does not prefill the calculator)
+        Log scale · weekly closes · solid = history · dashed = illustrative path to{" "}
+        {formatAxisPrice(BTC_FUTURE_SCENARIO.priceUsd)} in {BTC_FUTURE_SCENARIO.asOf} (same scenario as the calculator —
+        not a forecast; does not prefill the calculator)
       </p>
     </div>
   );

@@ -1,11 +1,23 @@
 /** Educational cycle markers for the historical BTC chart — not forecasts. */
 
+import { BTC_FUTURE_SCENARIO } from "../config/site";
+
 export type BtcHistoryPoint = {
   /** Unix seconds (UTC) */
   t: number;
   /** Close / market price USD */
   c: number;
 };
+
+/** Nov 1 of the future-scenario year — matches calculator wording, not a forecast date. */
+export const BTC_PROJECTION_END = {
+  time: Date.UTC(2029, 10, 1) / 1000,
+  priceUsd: BTC_FUTURE_SCENARIO.priceUsd,
+  label: `2029 scenario $${(BTC_FUTURE_SCENARIO.priceUsd / 1000).toFixed(0)}k`,
+} as const;
+
+/** Mid-horizon year tick on the projection segment (axis / marker only). */
+export const BTC_PROJECTION_MID_YEAR = 2027;
 
 export type BtcCycleAnnotation = {
   id: string;
@@ -90,5 +102,31 @@ export function toChartTime(unixSeconds: number): string {
   const m = String(d.getUTCMonth() + 1).padStart(2, "0");
   const day = String(d.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
+}
+
+/**
+ * Dashed extension from the last historical close to the illustrative 2029 scenario.
+ * Log-linear path so it reads cleanly on the log chart. Not a forecast — same $450k
+ * arithmetic the calculator uses.
+ */
+export function buildIllustrativeProjection(history: BtcHistoryPoint[]): BtcHistoryPoint[] {
+  if (history.length === 0) return [];
+  const start = history[history.length - 1];
+  const endT = BTC_PROJECTION_END.time;
+  const endP = BTC_PROJECTION_END.priceUsd;
+  if (endT <= start.t || start.c <= 0) return [start];
+
+  const weekSec = 7 * 86_400;
+  const out: BtcHistoryPoint[] = [{ t: start.t, c: start.c }];
+  const log0 = Math.log(start.c);
+  const log1 = Math.log(endP);
+  const span = endT - start.t;
+
+  for (let t = start.t + weekSec; t < endT; t += weekSec) {
+    const u = (t - start.t) / span;
+    out.push({ t, c: Math.exp(log0 + u * (log1 - log0)) });
+  }
+  out.push({ t: endT, c: endP });
+  return out;
 }
 
