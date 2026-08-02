@@ -49,7 +49,12 @@ export function SiteHeader() {
         <nav id="site-nav" className={`nav-links${open ? " is-open" : ""}`} aria-label="Primary">
           {links.map((link) =>
             "to" in link && link.to ? (
-              <NavLink key={link.to} to={link.to} onClick={() => setOpen(false)}>
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) => (isActive ? "is-active" : undefined)}
+                onClick={() => setOpen(false)}
+              >
                 {link.label}
               </NavLink>
             ) : (
@@ -58,7 +63,11 @@ export function SiteHeader() {
               </a>
             ),
           )}
-          <NavLink to="/book" className="btn btn-primary nav-cta" onClick={() => setOpen(false)}>
+          <NavLink
+            to="/book"
+            className={({ isActive }) => `btn btn-primary nav-cta${isActive ? " is-active" : ""}`}
+            onClick={() => setOpen(false)}
+          >
             Book orientation
           </NavLink>
         </nav>
