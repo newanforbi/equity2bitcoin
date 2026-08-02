@@ -32,7 +32,13 @@ export function SiteHeader() {
     <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
       <div className="container">
         <Link to="/" className="brand" onClick={() => setOpen(false)} aria-label="Equity2Bitcoin home">
-          Equity<span>2</span>Bitcoin
+          <img
+            src="/logo-equity2bitcoin-on-dark.png"
+            alt="Equity2Bitcoin"
+            width={220}
+            height={77}
+            className="brand-logo"
+          />
         </Link>
 
         <button

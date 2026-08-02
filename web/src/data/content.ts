@@ -269,7 +269,7 @@ export const CASE_STEPS = [
   },
   { label: "Reaches Bitcoin", value: formatUsd(WORKED_EXAMPLE.netToBitcoin) },
   {
-    label: "Illustrative monthly interest-only",
+    label: "Interest-only, monthly (2026 – 2029)",
     value: formatUsdPrecise(WORKED_EXAMPLE.monthlyInterestOnly),
   },
   { label: "Phases 4–5 Bitcoin education & close", value: "$0" },

@@ -8,7 +8,13 @@ export function SiteFooter() {
         <div className="footer-grid">
           <div>
             <div className="footer-brand">
-              Equity<span>2</span>Bitcoin
+              <img
+                src="/logo-equity2bitcoin-on-dark.png"
+                alt="Equity2Bitcoin"
+                width={200}
+                height={70}
+                className="footer-logo"
+              />
             </div>
             <p>{BRAND.tagline}</p>
             <p style={{ marginTop: "0.85rem" }}>{BRAND.principle}</p>
