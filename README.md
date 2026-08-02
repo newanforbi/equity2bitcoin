@@ -74,9 +74,9 @@ This repo is the **commercial conversion site** for Equity2Bitcoin — the publi
 
 Supporting docs:
 
-- [`SITE.md`](./SITE.md) — local launch, env vars, funnel notes  
-- [`LEGAL-REVIEW.md`](./LEGAL-REVIEW.md) — counsel checklist before pointing a live consumer domain  
-- [`Equity2Bitcoin_Business_Plan.pdf`](./Equity2Bitcoin_Business_Plan.pdf) — planning source document  
+- [`docs/SITE.md`](./docs/SITE.md) — local launch, env vars, funnel notes  
+- [`docs/LEGAL-REVIEW.md`](./docs/LEGAL-REVIEW.md) — counsel checklist before pointing a live consumer domain  
+- [`docs/Equity2Bitcoin_Business_Plan.pdf`](./docs/Equity2Bitcoin_Business_Plan.pdf) — planning source document  
 
 ---
 
@@ -162,7 +162,7 @@ None of those are required to ship the site. The core loop — **honest numbers 
 
 Private project — all rights reserved unless otherwise noted.
 
-This software and the public site make consumer-facing claims about a fee arrangement tied to home-equity borrowing and digital assets. **Do not point a live consumer domain at a deploy until counsel has reviewed [`LEGAL-REVIEW.md`](./LEGAL-REVIEW.md).**
+This software and the public site make consumer-facing claims about a fee arrangement tied to home-equity borrowing and digital assets. **Do not point a live consumer domain at a deploy until counsel has reviewed [`docs/LEGAL-REVIEW.md`](./docs/LEGAL-REVIEW.md).**
 
 ---
 
