@@ -1,4 +1,3 @@
-import { SITE } from "../config/site";
 import { BRAND } from "../data/content";
 
 export function TermsPage() {
@@ -34,7 +33,7 @@ export function TermsPage() {
           milestones stated therein — typically verified equity extraction — not by investment performance.
         </p>
         <h2>Contact</h2>
-        <p>Questions about these Terms: {SITE.email}</p>
+        <p>Questions about these Terms: legal@equity2bitcoin.com (placeholder — update before launch).</p>
       </div>
     </main>
   );
@@ -71,7 +70,8 @@ export function PrivacyPage() {
         <h2>Retention & rights</h2>
         <p>
           We retain information as needed for the engagement and legitimate business records. Depending on your
-          jurisdiction, you may request access, correction, or deletion by contacting {SITE.email}.
+          jurisdiction, you may request access, correction, or deletion by contacting privacy@equity2bitcoin.com
+          (placeholder — update before launch).
         </p>
       </div>
     </main>

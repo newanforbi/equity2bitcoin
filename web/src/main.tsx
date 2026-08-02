@@ -7,11 +7,9 @@ import "./styles/global.css";
 const root = document.getElementById("root");
 if (!root) throw new Error("Application root element was not found");
 
-const basename = import.meta.env.BASE_URL.replace(/\/$/, "") || undefined;
-
 createRoot(root).render(
   <StrictMode>
-    <BrowserRouter basename={basename}>
+    <BrowserRouter>
       <App />
     </BrowserRouter>
   </StrictMode>,

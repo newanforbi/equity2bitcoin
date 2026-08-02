@@ -2,6 +2,9 @@
 
 Marketing + conversion site for **Equity2Bitcoin Consulting LLC**.
 
+UI and funnel from the Cursor commercial-site work originally merged in
+[`interactive-litigation-portfolio@a23dadb`](https://github.com/newanforbi/interactive-litigation-portfolio/commit/a23dadbaf852ce9ebf535235713ea63b29c57fee).
+
 ## Local
 
 ```bash
@@ -15,25 +18,13 @@ Copy `web/.env.example` to `web/.env` (or set Vercel env vars):
 
 | Variable | Purpose |
 |---|---|
-| `VITE_CALENDLY_URL` | Calendly orientation event URL — enables inline booking embed |
-| `VITE_CALENDLY_REVIEW_URL` | Optional Milestone 1 review event |
+| `VITE_CALENDLY_URL` | Calendly event URL — enables inline booking embed |
 | `VITE_LEAD_WEBHOOK_URL` | Optional Zapier/Make/HubSpot webhook for quiz + form leads |
 
-Tunables (fee rate, BTC reference price, calculator defaults) live in `web/src/config/site.ts`.
-
-Without Calendly configured, `/book` shows a request form after the acknowledgment gate (and posts to the webhook if set).
+Without Calendly configured, `/book` shows a request form and stores a lead draft in `sessionStorage` (and posts to the webhook if set).
 
 ## Funnel
 
-1. Hero wake-up → Equity IQ quiz **or** `/calculator`  
-2. `/fit` self-qualification + volatility honesty  
-3. Quiz/calc → `/book` acknowledgment gate → Calendly / form  
-4. Milestone Agreement offline/DocuSign  
-
-## Substance
-
-LTV-aware tappable equity math, fee-before-BTC netting, carry-cost display, fit page, Why Bitcoin cycles without price targets, booking acknowledgment gate, `LEGAL-REVIEW.md`, equity unit tests.
-
-## Legal
-
-See [`LEGAL-REVIEW.md`](./LEGAL-REVIEW.md) before pointing a live consumer domain at this site.
+1. Hero wake-up → Equity IQ quiz  
+2. Quiz score saved to session → Book orientation  
+3. Calendly (or fallback form) → Milestone Agreement offline/DocuSign  
