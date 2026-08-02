@@ -70,7 +70,7 @@ export function BitcoinHistoryChart() {
             borderColor: "rgba(212, 175, 55, 0.2)",
             mode: PriceScaleMode.Logarithmic,
             entireTextOnly: true,
-            scaleMargins: { top: 0.14, bottom: 0.08 },
+            scaleMargins: { top: 0.1, bottom: 0.06 },
           },
           timeScale: {
             borderColor: "rgba(212, 175, 55, 0.2)",
@@ -101,6 +101,10 @@ export function BitcoinHistoryChart() {
               return `$${price.toPrecision(2)}`;
             },
           },
+          // Clamp log autoscale so marker labels don't push the axis into multi-million nonsense.
+          autoscaleInfoProvider: () => ({
+            priceRange: { minValue: 0.05, maxValue: 250_000 },
+          }),
         });
 
         const data = points.map((p) => ({
