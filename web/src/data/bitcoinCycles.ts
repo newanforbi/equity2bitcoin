@@ -60,6 +60,30 @@ export async function loadBtcHistory(): Promise<BtcHistoryPoint[]> {
   return body.points.filter((p) => Number.isFinite(p.c) && p.c > 0 && Number.isFinite(p.t));
 }
 
+/**
+ * Lightweight Charts spaces each bar equally — not by calendar time.
+ * Our snapshot is ~4-day early history + daily from 2019, which stretches recent
+ * years and crowds the x-axis. Weekly closes restore roughly even year spacing.
+ */
+export function downsampleToWeekly(points: BtcHistoryPoint[]): BtcHistoryPoint[] {
+  if (points.length === 0) return [];
+  const weekSec = 7 * 86_400;
+  const out: BtcHistoryPoint[] = [];
+  let bucket = Math.floor(points[0].t / weekSec);
+  let last = points[0];
+  for (let i = 1; i < points.length; i++) {
+    const p = points[i];
+    const b = Math.floor(p.t / weekSec);
+    if (b !== bucket) {
+      out.push(last);
+      bucket = b;
+    }
+    last = p;
+  }
+  out.push(last);
+  return out;
+}
+
 export function toChartTime(unixSeconds: number): string {
   const d = new Date(unixSeconds * 1000);
   const y = d.getUTCFullYear();
@@ -67,3 +91,4 @@ export function toChartTime(unixSeconds: number): string {
   const day = String(d.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
+

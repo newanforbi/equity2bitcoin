@@ -7,13 +7,27 @@ import {
   type SeriesMarker,
   type Time,
   PriceScaleMode,
+  TickMarkType,
 } from "lightweight-charts";
 import {
   BTC_CYCLE_ANNOTATIONS,
+  downsampleToWeekly,
   loadBtcHistory,
   toChartTime,
   type BtcHistoryPoint,
 } from "../data/bitcoinCycles";
+
+function yearFromTime(time: Time): number {
+  if (typeof time === "string") return Number(time.slice(0, 4));
+  if (typeof time === "object") return time.year;
+  return new Date(time * 1000).getUTCFullYear();
+}
+
+/** Year-only ticks on the all-time view — month/day labels were crowding 2020–2026. */
+function btcHistoryTickMarkFormatter(time: Time, tickMarkType: TickMarkType): string | null {
+  if (tickMarkType === TickMarkType.Year) return String(yearFromTime(time));
+  return null;
+}
 
 function nearestPoint(points: BtcHistoryPoint[], target: number): BtcHistoryPoint {
   let best = points[0];
@@ -49,7 +63,9 @@ export function BitcoinHistoryChart() {
 
     (async () => {
       try {
-        const points = await loadBtcHistory();
+        const rawPoints = await loadBtcHistory();
+        // Uniform weekly bars → calendar years get roughly equal width on the x-axis.
+        const points = downsampleToWeekly(rawPoints);
         if (cancelled || !hostRef.current) return;
 
         const height = Math.min(420, Math.max(300, Math.round(host.clientWidth * 0.42)));
@@ -76,8 +92,9 @@ export function BitcoinHistoryChart() {
           timeScale: {
             borderColor: "rgba(212, 175, 55, 0.2)",
             // Keep all-time history readable; page scroll must not zoom the chart.
-            minBarSpacing: 0.05,
-            rightOffset: 4,
+            minBarSpacing: 0.3,
+            rightOffset: 2,
+            tickMarkFormatter: btcHistoryTickMarkFormatter,
           },
           crosshair: {
             vertLine: { color: "rgba(212, 175, 55, 0.35)", labelBackgroundColor: "#1f1c18" },
@@ -175,8 +192,8 @@ export function BitcoinHistoryChart() {
         aria-label="Logarithmic chart of Bitcoin price in US dollars from 2010 through today, with major cycle peaks and troughs marked"
       />
       <p className="btc-history-chart-hint form-note">
-        Log scale · drag to pan · pinch or drag axis to zoom · USD · static historical snapshot from 2010 (not a live
-        feed; does not prefill the calculator)
+        Log scale · weekly closes · drag to pan · pinch or drag axis to zoom · USD · static snapshot from 2010 (not a
+        live feed; does not prefill the calculator)
       </p>
     </div>
   );
