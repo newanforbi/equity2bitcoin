@@ -1,0 +1,22 @@
+.cta-band__card {
+  padding: var(--space-7);
+  text-align: center;
+}
+
+.cta-band__heading {
+  margin-bottom: var(--space-3);
+}
+
+.cta-band__body {
+  margin: 0 auto;
+}
+
+.cta-band .btn-row {
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .cta-band__card {
+    padding: var(--space-5);
+  }
+}

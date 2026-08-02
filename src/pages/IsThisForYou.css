@@ -1,0 +1,42 @@
+.fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.fit__col--good {
+  border-left: 3px solid var(--credit);
+}
+
+.fit__col--poor {
+  border-left: 3px solid var(--debit);
+}
+
+.fit__title {
+  font-size: 1.25rem;
+  margin-bottom: var(--space-4);
+}
+
+.fit__list {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+}
+
+.fit__list li {
+  margin-bottom: var(--space-3);
+}
+
+.fit__list li:last-child {
+  margin-bottom: 0;
+}
+
+.fit__col--poor .fit__list li::marker {
+  color: var(--debit);
+}
+
+.fit__col--good .fit__list li::marker {
+  color: var(--credit);
+}

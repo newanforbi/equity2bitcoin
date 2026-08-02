@@ -1,0 +1,31 @@
+.calendly {
+  width: 100%;
+}
+
+.calendly__widget {
+  min-width: 100%;
+  height: 760px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: var(--border-subtle);
+  background: var(--ink-800);
+}
+
+.calendly__placeholder code {
+  font-family: var(--font-mono);
+  font-size: 0.8125em;
+  background: var(--ink-750);
+  border: var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+.calendly__url {
+  word-break: break-all;
+}
+
+@media (max-width: 640px) {
+  .calendly__widget {
+    height: 900px;
+  }
+}

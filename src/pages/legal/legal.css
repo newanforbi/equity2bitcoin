@@ -1,0 +1,19 @@
+.legal h2 {
+  font-size: 1.35rem;
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: var(--border-subtle);
+}
+
+.legal h2:first-of-type {
+  margin-top: var(--space-6);
+}
+
+.legal p,
+.legal li {
+  color: var(--text-secondary);
+}
+
+.legal .notice p {
+  color: inherit;
+}
