@@ -70,7 +70,8 @@ export function BitcoinHistoryChart() {
             borderColor: "rgba(212, 175, 55, 0.2)",
             mode: PriceScaleMode.Logarithmic,
             entireTextOnly: true,
-            scaleMargins: { top: 0.1, bottom: 0.06 },
+            // Keep margins tight on log scale — large % margins explode into multi-million headroom.
+            scaleMargins: { top: 0.02, bottom: 0.02 },
           },
           timeScale: {
             borderColor: "rgba(212, 175, 55, 0.2)",
